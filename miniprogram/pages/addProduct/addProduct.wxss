@@ -1,0 +1,4 @@
+/* miniprogram/pages/addProduct/addProduct.wxss */
+.page__bd_spacing {
+  margin-top: 20px;
+}

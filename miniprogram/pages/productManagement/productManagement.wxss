@@ -1,0 +1,21 @@
+page {
+  background-color: #f8f8f8;
+  height: 100%;
+  font-size: 32rpx;
+  line-height: 1.6;
+}
+
+.product_icon {
+  width: 65px;
+  height: 65px;
+  display: block;
+  border-radius: 15rpx 15rpx;
+}
+
+.weui-cells__title {
+  font-size: 15px;
+}
+
+.page__bd_spacing {
+  margin-top: 20px;
+}

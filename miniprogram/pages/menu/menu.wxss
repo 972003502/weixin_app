@@ -1,0 +1,32 @@
+/* miniprogram/pages/menu/menu.wxss */
+
+.cu-list {
+  height: 80px;
+}
+
+.cu-list.card-text {
+  margin-left: 10px;
+  height: 80px;
+  color: var(--grey);
+}
+
+.title {
+  font-size: 16px;
+}
+
+.describe {
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+
+.price {
+  margin-right: 210px;
+  font-size: 16px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.buy {
+  position:absolute;
+  width: 65px;
+}

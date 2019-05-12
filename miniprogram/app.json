@@ -1,0 +1,45 @@
+{
+  "pages": [
+    "pages/menu/menu",
+    "pages/productManagement/productManagement",
+    "pages/addProduct/addProduct",
+    "pages/aboutme/aboutme",
+    "pages/index/index",
+    "pages/userConsole/userConsole",
+    "pages/storageConsole/storageConsole",
+    "pages/databaseGuide/databaseGuide",
+    "pages/addFunction/addFunction",
+    "pages/deployFunctions/deployFunctions",
+    "pages/chooseLib/chooseLib",
+    "pages/openapi/openapi"
+  ],
+  "tabBar": {
+    "borderStyle": "white",
+    "list": [
+      {
+        "text": "测试",
+        "pagePath": "pages/index/index"
+      },
+      {
+        "selectedIconPath": "images/menu_selected.png",
+        "iconPath": "images/menu.png",
+        "text": "菜单",
+        "pagePath": "pages/menu/menu"
+      },
+      {
+        "selectedIconPath": "images/user_selected.png",
+        "iconPath": "images/user.png",
+        "text": "我",
+        "pagePath": "pages/aboutme/aboutme"
+      }
+    ]
+  },
+  "window": {
+    "backgroundColor": "#F6F6F6",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F6F6F6",
+    "navigationBarTitleText": "云开发 QuickStart",
+    "navigationBarTextStyle": "black"
+  },
+  "sitemapLocation": "sitemap.json"
+}
