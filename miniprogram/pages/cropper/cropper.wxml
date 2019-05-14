@@ -1,0 +1,19 @@
+<image-cropper 
+id="image-cropper" 
+bindload="cropperload" 
+bindimageload="loadimage" 
+limit_move="true" 
+disable_rotate="false" 
+width="{{width}}" 
+height="{{height}}" 
+imgSrc="{{src}}" 
+disable_width="false"
+disable_height="false" 
+disable_ratio="false">
+</image-cropper>
+
+<view class='bottom'>
+  <text bindtap='chooseImage' class='text1'>取消</text>
+  <text catchtouchstart='rotate' catchtouchend='end' data-type="rotate" class='text2'>旋转</text>
+  <text catchtap='getImgSrc' class='text3'>完成</text>
+</view>

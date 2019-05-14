@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/menu/menu",
+    "pages/cropper/cropper",
     "pages/productManagement/productManagement",
     "pages/addProduct/addProduct",
     "pages/aboutme/aboutme",

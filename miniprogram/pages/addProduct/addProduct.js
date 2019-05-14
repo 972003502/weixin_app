@@ -21,7 +21,7 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
+  onLoad: function () {
   },
 
   isFillComplete() {
@@ -71,27 +71,16 @@ Page({
   chooseImage() {
     wx.chooseImage({
       count: 1, //默认9
-      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+      sizeType: ['compressed'], //可以指定是原图还是压缩图，默认二者都有
       sourceType: ['album'], //从相册选择
       success: (res) => {
-        wx.showLoading({
-          title: '上传中'
+        const tempFilePaths = res.tempFilePaths[0];
+        wx.navigateTo({
+          url: '../cropper/cropper?src=' + tempFilePaths
         })
-        if (this.data.imgList.length != 0) {
-          this.setData({
-            imgList: this.data.imgList.concat(res.tempFilePaths)
-          })
-        } else {
-          this.setData({
-            imgList: res.tempFilePaths,
-            product_icon: res.tempFilePaths[0]
-          })
-          this.isFillComplete();
-        }
       },
       fail: e => { },
-      complete: () => {
-        wx.hideLoading()
+      complete: () => { 
       }
     });
   },
@@ -204,7 +193,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    this.isFillComplete();
   },
 
   /**

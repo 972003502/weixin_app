@@ -1,0 +1,47 @@
+page {
+  background: rgb(14, 13, 13);
+}
+
+.bottom {
+  background-color: none;
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  display: flex;
+  z-index: 10;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  height: 120rpx;
+  border-top: 0.3px solid rgb(48, 48, 48);
+}
+
+.text1 {
+  background-color: none;
+  font-size: 33rpx;
+  color: white;
+  z-index: 11;
+  padding: 0 0rpx;
+  min-width: 70rpx;
+  margin-right: 50px;
+}
+
+.text2 {
+  background-color: none;
+  font-size: 33rpx;
+  color: white;
+  z-index: 11;
+  padding: 0 0rpx;
+  min-width: 70rpx;
+  margin: 0 50px;
+}
+
+.text3 {
+  background-color: none;
+  font-size: 33rpx;
+  color: white;
+  z-index: 11;
+  padding: 0 0rpx;
+  min-width: 70rpx;
+  margin-left: 50px;
+}

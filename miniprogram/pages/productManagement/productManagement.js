@@ -13,7 +13,7 @@ Page({
    */
   onLoad: function (options) {
     this.onQuery();
-
+    console.log("onLoad已执行");
   },
 
   onQuery: function () {
@@ -61,25 +61,28 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
+    console.log("onReady已执行");
   },
 
   /**
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    console.log("onShow已执行");
   },
 
   /**
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
+    console.log("onHide已执行");
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
+    console.log("onUnload已执行");
   },
 
   /**
