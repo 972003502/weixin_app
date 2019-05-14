@@ -37,7 +37,20 @@ Page({
   },
 
   chooseImage() {
-    
+    let that = this;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album'],
+      success(res) {
+        const tempFilePaths = res.tempFilePaths[0];
+        //重置图片角度、缩放、位置
+        that.cropper.imgReset();
+        that.setData({
+          src: tempFilePaths
+        });
+      }
+    })
   },
 
   rotate() {
