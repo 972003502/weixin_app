@@ -7,21 +7,16 @@ Page({
 
   onLoad: function (options) {
     this.cropper = this.selectComponent("#image-cropper");
-    this.cropper.imgReset();
     this.setData({
       src: options.src
     });
   },
 
-  onReady: function () {
-
-  },
   cropperload(e) {
     console.log('cropper加载完成');
   },
+  
   loadimage(e) {
-    wx.hideLoading();
-    this.cropper.imgReset();
   },
 
   getImgSrc() {
@@ -57,4 +52,6 @@ Page({
     //在用户旋转的基础上旋转90°
     this.cropper.setAngle(this.cropper.data.angle += 90);
   },
+
+  
 })

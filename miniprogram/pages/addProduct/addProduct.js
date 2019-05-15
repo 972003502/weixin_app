@@ -70,18 +70,16 @@ Page({
 
   chooseImage() {
     wx.chooseImage({
-      count: 1, //默认9
+      count: 1, 
       sizeType: ['compressed'], //可以指定是原图还是压缩图，默认二者都有
       sourceType: ['album'], //从相册选择
       success: (res) => {
-        const tempFilePaths = res.tempFilePaths[0];
         wx.navigateTo({
-          url: '../cropper/cropper?src=' + tempFilePaths
+          url: '../cropper/cropper?src=' + res.tempFilePaths[0]
         })
       },
       fail: e => { },
-      complete: () => { 
-      }
+      complete: () => { }
     });
   },
 
@@ -91,10 +89,11 @@ Page({
       current: e.currentTarget.dataset.url
     });
   },
+
   delImg(e) {
     wx.showModal({
       title: '提示',
-      content: '是否删除这张照片？',
+      content: '是否删除这张图片？',
       cancelText: '取消',
       confirmText: '确定',
       success: res => {
