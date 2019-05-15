@@ -2,7 +2,7 @@ Page({
   data: {
     src: '',
     width: 300,//宽度
-    height: 250//高度
+    height: 170//高度
   },
 
   onLoad: function (options) {
@@ -52,6 +52,4 @@ Page({
     //在用户旋转的基础上旋转90°
     this.cropper.setAngle(this.cropper.data.angle += 90);
   },
-
-  
 })

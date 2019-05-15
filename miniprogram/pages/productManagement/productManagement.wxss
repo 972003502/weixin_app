@@ -12,6 +12,14 @@ page {
   border-radius: 15rpx 15rpx;
 }
 
+.weui-cell:before {
+  left: 100px;
+}
+
+.weui-cell__bd {
+  margin-left: 10px;
+}
+
 .weui-cells__title {
   font-size: 15px;
 }
