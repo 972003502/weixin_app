@@ -70,13 +70,20 @@ Page({
 
   chooseImage() {
     wx.chooseImage({
-      count: 1, 
+      count: 1,
       sizeType: ['compressed'], //可以指定是原图还是压缩图，默认二者都有
       sourceType: ['album'], //从相册选择
       success: (res) => {
-        wx.navigateTo({
-          url: '../cropper/cropper?src=' + res.tempFilePaths[0]
-        })
+        let str = 'aaa.jpg';
+        str.slice(-3,0);
+        console.log(str);
+        if (res.tempFilePaths[0] == 'jpg') {
+          wx.navigateTo({
+            url: '../cropper/cropper?src=' + res.tempFilePaths[0]
+          })
+        } else {
+
+        }
       },
       fail: e => { },
       complete: () => { }

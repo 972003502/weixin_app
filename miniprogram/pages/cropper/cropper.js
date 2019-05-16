@@ -15,20 +15,44 @@ Page({
   cropperload(e) {
     console.log('cropper加载完成');
   },
-  
+
   loadimage(e) {
   },
 
   getImgSrc() {
-    this.cropper.getImg((imageObj) => {
-      let pages = getCurrentPages();
-      let addProductPage = pages[pages.length - 2];
-      addProductPage.setData({
-        imgList: [imageObj.url],
-        product_icon: imageObj.url
-      }, wx.navigateBack({})
-      )
-    });
+    if (wx.canIUse('compressImage')) {
+      this.cropper.getImg((imageObj) => {
+        wx.compressImage({
+          src: imageObj.url, // 图片路径
+          quality: 10, // 压缩质量
+          success: (res) => {
+            let pages = getCurrentPages();
+            let addProductPage = pages[pages.length - 2];
+            addProductPage.setData({
+              imgList: [res.tempFilePath],
+              product_icon: res.tempFilePath
+            }
+            )
+          },
+          fail: e => {
+            console.log("压缩图片失败")
+          },
+          complete: () => {
+            wx.navigateBack();
+          }
+        })
+      });
+    } else {
+      this.cropper.getImg((imageObj) => {
+        let pages = getCurrentPages();
+        let addProductPage = pages[pages.length - 2];
+        addProductPage.setData({
+          imgList: [imageObj.url],
+          product_icon: imageObj.url
+        }, wx.navigateBack({})
+        )
+      });
+    }
   },
 
   chooseImage() {
