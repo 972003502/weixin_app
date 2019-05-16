@@ -6,7 +6,7 @@
 
         <view class="weui-cell" wx:for="{{classify}}" wx:for-item="product" wx:key="product._id">
           <view class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-            <image src="{{product.product_icon}}" class='product_icon'/>
+            <image src="{{product.product_icon}}" class='product_icon' mode='aspectFill'/>
           </view>
           <view class="weui-cell__bd">
             <view>{{product.product_name}}</view>
