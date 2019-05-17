@@ -1,4 +1,6 @@
 // miniprogram/pages/addProduct/addProduct.js
+import Product from '../../db-table/product.js';
+
 Page({
   /**
    * 页面的初始数据
@@ -7,6 +9,7 @@ Page({
     index: null,
     imgList: [],
     picker: ['Coffee', 'Tea', 'Soda'],
+    productDis: null,
     product_classify: null,
     product_name: null,
     product_describe: null,
@@ -22,6 +25,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function () {
+    this.product = new Product();
   },
 
   isFillComplete() {
