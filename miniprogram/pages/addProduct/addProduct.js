@@ -1,5 +1,6 @@
 // miniprogram/pages/addProduct/addProduct.js
-import Product from '../../db-table/product.js';
+import table_Projuct from '../../database/table/product.js';
+import DataBaseObject from '../../database/DataBaseObject.js'
 
 Page({
   /**
@@ -15,48 +16,48 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function () {
-    this.product = new Product();
+    this.product = new DataBaseObject(table_Projuct);
   },
 
-  isFillComplete() {
-    if (this.product.getFieidValue('name') && this.product.getFieidValue('classify')
-      && this.product.getFieidValue('price') && this.product.getFieidValue('describe')
-      && this.product.getFieidValue('icon')) {
-      this.setData({
-        isComplete: true
-      })
-    }
-    else {
-      this.setData({
-        isComplete: false
-      })
-    }
-  },
-
-  pickerChange(e) {
+  /**
+ * 生命周期函数--监听页面显示
+ */
+  onShow: function () {
     this.setData({
-      index: e.detail.value
+      isComplete: this.product.isContainNull()
     })
-    this.product.setFieidValue('classify', this.data.picker[e.detail.value]);
-    this.isFillComplete();
   },
 
-  bindProductNameInput(e) {
-    this.product.setFieidValue('name', e.detail.value);
-    this.isFillComplete();
+  onPickerChange(e) {
+    this.product.setValue('classify', this.data.picker[e.detail.value]);
+    this.setData({
+      index: e.detail.value,
+      isComplete: this.product.isContainNull()
+    })
   },
 
-  bindProductDescribeInput(e) {
-    this.product.setFieidValue('describe', e.detail.value);
-    this.isFillComplete();
+  onNameInput(e) {
+    this.product.setValue('name', e.detail.value);
+    this.setData({
+      isComplete: this.product.isContainNull()
+    })
   },
 
-  bindProductPriceInput(e) {
-    this.product.setFieidValue('price', e.detail.value);
-    this.isFillComplete();
+  onDescribeInput(e) {
+    this.product.setValue('describe', e.detail.value);
+    this.setData({
+      isComplete: this.product.isContainNull()
+    })
   },
 
-  chooseImage() {
+  onPriceInput(e) {
+    this.product.setValue('price', e.detail.value);
+    this.setData({
+      isComplete: this.product.isContainNull()
+    })
+  },
+
+  onChooseImage() {
     wx.chooseImage({
       count: 1,
       sizeType: ['compressed'], //可以指定是原图还是压缩图，默认二者都有
@@ -71,14 +72,14 @@ Page({
     });
   },
 
-  viewImage(e) {
+  onViewImage(e) {
     wx.previewImage({
       urls: this.data.imgList,
       current: e.currentTarget.dataset.url
     });
   },
 
-  delImg(e) {
+  onDelImg(e) {
     wx.showModal({
       title: '提示',
       content: '是否删除这张图片？',
@@ -90,24 +91,30 @@ Page({
           this.setData({
             imgList: this.data.imgList
           })
-          this.product.setFieidValue('icon', null);
-          this.isFillComplete();
+          this.product.setValue('icon', null);
+          this.setData({
+            isComplete: this.product.isContainNull()
+          })
         }
       }
     })
+  },
+
+  onSubmit() {
+    this.cloudUploadFile();
   },
 
   cloudUploadFile() {
     wx.showLoading({
       title: '提交中'
     })
-    const filePath = this.product.getFieidValue('icon');
+    const filePath = this.product.getValue('icon');
     const cloudPath = 'product_icon_' + Date.now() + filePath.match(/\.[^.]+?$/)[0];
     wx.cloud.uploadFile({
       cloudPath,
       filePath,
       success: res => {
-        this.product.setFieidValue('icon', res.fileID);
+        this.product.setValue('icon', res.fileID);
       },
       fail: e => {
         wx.showToast({
@@ -116,96 +123,32 @@ Page({
         })
       },
       complete: () => {
-        this.addProductInDB();
+        this.product.addInDB({
+          success: res => {
+            wx.hideLoading();
+            wx.showToast({
+              title: '提交成功',
+            })
+          },
+          fail: err => {
+            wx.showToast({
+              icon: 'none',
+              title: '提交失败'
+            })
+          },
+          complete: () => {
+            this.product.clearValue();
+            this.setData({
+              nameInput: null,
+              describeInput: null,
+              priceInput: null,
+              index: null,
+              imgList: [],
+              isComplete: false
+            })
+          }
+        });
       }
     })
-  },
-
-  addProductInDB() {
-    const db = wx.cloud.database()
-    db.collection('product').add({
-      data: this.product.fieids,
-      success: res => {
-        wx.hideLoading();
-        wx.showToast({
-          title: '提交成功',
-        })
-      },
-      fail: err => {
-        wx.showToast({
-          icon: 'none',
-          title: '提交失败'
-        })
-      },
-      complete: () => {
-        this.product.clear();
-        this.setData({
-          nameInput: null,
-          describeInput: null,
-          priceInput: null,
-          index: null,
-          imgList: [],
-          isComplete: false
-        })
-      }
-    })
-  },
-
-  onSubmit() {
-    // this.cloudUploadFile();
-    console.log(this.product.fieids.name);
-    this.product.setFieidValue('name', null);
-    // this.setData({
-    //   nameInput: null
-    // })
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-    this.isFillComplete();
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-
   }
 })

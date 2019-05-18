@@ -23,7 +23,7 @@ Page({
     this.cropper.getImg((imageObj) => {
       let pages = getCurrentPages();
       let addProductPage = pages[pages.length - 2];
-      addProductPage.product.setFieidValue('icon', imageObj.url);
+      addProductPage.product.setValue('icon', imageObj.url);
       addProductPage.setData({
         imgList: [imageObj.url]
       }, wx.navigateBack({})
