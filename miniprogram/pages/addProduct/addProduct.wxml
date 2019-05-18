@@ -11,7 +11,7 @@
 
   <view class="cu-form-group">
     <view class="title">产品名称</view>
-    <input bindinput="bindProductNameInput" style="text-align: right;" placeholder="请输入产品名称" value='{{product_name}}'></input>
+    <input bindinput="bindProductNameInput" style="text-align: right;" placeholder="请输入产品名称" value='{{nameInput}}'></input>
   </view>
 
   <view class="cu-form-group">

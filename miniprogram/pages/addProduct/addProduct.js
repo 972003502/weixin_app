@@ -6,18 +6,8 @@ Page({
    * 页面的初始数据
    */
   data: {
-    index: null,
     imgList: [],
     picker: ['Coffee', 'Tea', 'Soda'],
-    productDis: null,
-    product_classify: null,
-    product_name: null,
-    product_describe: null,
-    product_price: null,
-    product_icon: null,
-    nameInput: null,
-    describeInput: null,
-    priceInput: null,
     isComplete: false
   },
 
@@ -29,9 +19,9 @@ Page({
   },
 
   isFillComplete() {
-    if (this.data.product_name && this.data.product_classify
-      && this.data.product_price && this.data.product_describe
-      && this.data.product_icon) {
+    if (this.product.getFieidValue('name') && this.product.getFieidValue('classify')
+      && this.product.getFieidValue('price') && this.product.getFieidValue('describe')
+      && this.product.getFieidValue('icon')) {
       this.setData({
         isComplete: true
       })
@@ -45,30 +35,24 @@ Page({
 
   pickerChange(e) {
     this.setData({
-      index: e.detail.value,
-      product_classify: this.data.picker[e.detail.value]
+      index: e.detail.value
     })
+    this.product.setFieidValue('classify', this.data.picker[e.detail.value]);
     this.isFillComplete();
   },
 
   bindProductNameInput(e) {
-    this.setData({
-      product_name: e.detail.value
-    })
+    this.product.setFieidValue('name', e.detail.value);
     this.isFillComplete();
   },
 
   bindProductDescribeInput(e) {
-    this.setData({
-      product_describe: e.detail.value
-    })
+    this.product.setFieidValue('describe', e.detail.value);
     this.isFillComplete();
   },
 
   bindProductPriceInput(e) {
-    this.setData({
-      product_price: e.detail.value
-    })
+    this.product.setFieidValue('price', e.detail.value);
     this.isFillComplete();
   },
 
@@ -104,9 +88,9 @@ Page({
         if (res.confirm) {
           this.data.imgList.splice(e.currentTarget.dataset.index, 1);
           this.setData({
-            imgList: this.data.imgList,
-            product_icon: null
+            imgList: this.data.imgList
           })
+          this.product.setFieidValue('icon', null);
           this.isFillComplete();
         }
       }
@@ -117,15 +101,13 @@ Page({
     wx.showLoading({
       title: '提交中'
     })
-    const filePath = this.data.product_icon;
+    const filePath = this.product.getFieidValue('icon');
     const cloudPath = 'product_icon_' + Date.now() + filePath.match(/\.[^.]+?$/)[0];
     wx.cloud.uploadFile({
       cloudPath,
       filePath,
       success: res => {
-        this.setData({
-          product_icon: res.fileID
-        })
+        this.product.setFieidValue('icon', res.fileID);
       },
       fail: e => {
         wx.showToast({
@@ -142,15 +124,7 @@ Page({
   addProductInDB() {
     const db = wx.cloud.database()
     db.collection('product').add({
-      data: {
-        product_classify: this.data.product_classify,
-        product_icon: this.data.product_icon,
-        product_name: this.data.product_name,
-        product_describe: this.data.product_describe,
-        product_price: this.data.product_price,
-        sales_status: 1,
-        product_sort: 1
-      },
+      data: this.product.fieids,
       success: res => {
         wx.hideLoading();
         wx.showToast({
@@ -164,12 +138,8 @@ Page({
         })
       },
       complete: () => {
+        this.product.clear();
         this.setData({
-          product_classify: null,
-          product_icon: null,
-          product_name: null,
-          product_describe: null,
-          product_price: null,
           nameInput: null,
           describeInput: null,
           priceInput: null,
@@ -182,7 +152,12 @@ Page({
   },
 
   onSubmit() {
-    this.cloudUploadFile();
+    // this.cloudUploadFile();
+    console.log(this.product.fieids.name);
+    this.product.setFieidValue('name', null);
+    // this.setData({
+    //   nameInput: null
+    // })
   },
 
   /**

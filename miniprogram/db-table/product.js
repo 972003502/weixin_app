@@ -8,6 +8,9 @@ class Product {
     status: null,
     sort: null
   }
+  get fieids() {
+    return this._fieids;
+  }
   setFieidValue(fieidName, fieidValue) {
     if (fieidName in this._fieids) {
       this._fieids[fieidName] = fieidValue;
@@ -18,8 +21,10 @@ class Product {
   getFieidValue(fieidName) {
     return this._fieids[fieidName];
   }
-  get fieids() {
-    return this._fieids;
+  clear() {
+    for(let obj in this._fieids) {
+      obj = null;
+    }
   }
 };
 
