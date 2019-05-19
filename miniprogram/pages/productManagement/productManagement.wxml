@@ -1,17 +1,17 @@
 <view class="page">
   <view class="page__bd">
     <view wx:for="{{products}}" wx:for-item="classify" wx:key="classify">
-      <view class="weui-cells__title">{{classify[0].product_classify}}</view>
+      <view class="weui-cells__title">{{classify[0].classify}}</view>
       <view class="weui-cells weui-cells_after-title">
 
         <view class="weui-cell" wx:for="{{classify}}" wx:for-item="product" wx:key="product._id">
           <view class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-            <image src="{{product.product_icon}}" class='product_icon' mode='aspectFill'/>
+            <image src="{{product.icon}}" class='product_icon' mode='aspectFill'/>
           </view>
           <view class="weui-cell__bd">
-            <view>{{product.product_name}}</view>
-            <view style="font-size: 13px;color: #888888;">{{product.product_describe}}</view>
-            <view style="font-size: 13px;color: #888888;">￥ {{product.product_price}}</view>
+            <view>{{product.name}}</view>
+            <view style="font-size: 13px;color: #888888;">{{product.describe}}</view>
+            <view style="font-size: 13px;color: #888888;">￥ {{product.price}}</view>
           </view>
           <view class="weui-cell__ft weui-cell__ft_in-access"></view>
         </view>

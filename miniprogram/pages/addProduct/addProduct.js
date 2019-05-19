@@ -1,4 +1,3 @@
-// miniprogram/pages/addProduct/addProduct.js
 import table_Projuct from '../../database/table/product.js';
 import DataBaseObject from '../../database/DataBaseObject.js'
 
@@ -28,7 +27,7 @@ Page({
     })
   },
 
-  onPickerChange(e) {
+  onPickerChange: function (e) {
     this.product.setValue('classify', this.data.picker[e.detail.value]);
     this.setData({
       index: e.detail.value,
@@ -36,28 +35,28 @@ Page({
     })
   },
 
-  onNameInput(e) {
+  onNameInput: function (e) {
     this.product.setValue('name', e.detail.value);
     this.setData({
       isComplete: this.product.isContainNull()
     })
   },
 
-  onDescribeInput(e) {
+  onDescribeInput: function (e) {
     this.product.setValue('describe', e.detail.value);
     this.setData({
       isComplete: this.product.isContainNull()
     })
   },
 
-  onPriceInput(e) {
+  onPriceInput: function (e) {
     this.product.setValue('price', e.detail.value);
     this.setData({
       isComplete: this.product.isContainNull()
     })
   },
 
-  onChooseImage() {
+  onChooseImage: function () {
     wx.chooseImage({
       count: 1,
       sizeType: ['compressed'], //可以指定是原图还是压缩图，默认二者都有
@@ -72,14 +71,14 @@ Page({
     });
   },
 
-  onViewImage(e) {
+  onViewImage: function (e) {
     wx.previewImage({
       urls: this.data.imgList,
       current: e.currentTarget.dataset.url
     });
   },
 
-  onDelImg(e) {
+  onDelImg: function (e) {
     wx.showModal({
       title: '提示',
       content: '是否删除这张图片？',
@@ -100,11 +99,11 @@ Page({
     })
   },
 
-  onSubmit() {
+  onSubmit: function () {
     this.cloudUploadFile();
   },
 
-  cloudUploadFile() {
+  cloudUploadFile: function () {
     wx.showLoading({
       title: '提交中'
     })

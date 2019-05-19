@@ -9,13 +9,13 @@
 <view class="cu-card case {{isCard?'no-card':''}}" wx:for="{{products}}" wx:key="_id">
   <view class="cu-item shadow">
     <view class="image">
-      <image src="{{item.product_icon}}" mode="widthFix"></image>
+      <image src="{{item.icon}}" mode="widthFix"></image>
       <view class="cu-tag bg-orange">热门</view>
     </view>
     <view class="cu-list card-text">
-      <view class='title'>{{item.product_name}}</view>
-      <view class='describe'>{{item.product_describe}}</view>
-      <view class='price'>￥ {{item.product_price}}</view>
+      <view class='title'>{{item.name}}</view>
+      <view class='describe'>{{item.describe}}</view>
+      <view class='price'>￥ {{item.price}}</view>
       <button class="cu-btn round sm bg-green buy" bindtap="">立即购买</button>
     </view>
   </view>
