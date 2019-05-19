@@ -5,6 +5,7 @@ Page({
   /**
    * 页面的初始数据
    */
+  path: "pages/productManagement/productManagement",
   data: {
     products: []
   },
@@ -12,7 +13,12 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
+  // onLoad: function (options) {
+  //   this.product = new DataBaseObject(table_Projuct);
+  //   this.onQuery();
+  // },
+
+  onPreload: function() {
     this.product = new DataBaseObject(table_Projuct);
     this.onQuery();
   },

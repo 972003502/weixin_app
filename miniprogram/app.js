@@ -1,4 +1,9 @@
 //app.js
+import extend from './components/mp-extend/extend-config.js';
+App = extend.App
+Page = extend.Page
+Component = extend.Component
+
 App({
   onLaunch: function () {
     
