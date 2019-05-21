@@ -18,12 +18,12 @@ Page({
   //   this.onQuery();
   // },
 
-  onPreload: function() {
+  onPreload: function () {
     this.product = new DataBaseObject(table_Projuct);
     this.onQuery();
   },
 
-  onQuery: function() {
+  onQuery: function () {
     this.product.queryInDb({
       success: res => {
         this.setData({

@@ -2,6 +2,7 @@
 import table_Projuct from '../../database/table/product.js';
 import DataBaseObject from '../../database/DataBaseObject.js';
 
+const app = getApp()
 Page({
   /**
    * 页面的初始数据
