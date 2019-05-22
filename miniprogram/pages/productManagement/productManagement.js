@@ -7,8 +7,7 @@ Page({
    */
   path: "pages/productManagement/productManagement",
   data: {
-    products: [],
-    display: true
+    products: []
   },
 
   /**
@@ -44,7 +43,7 @@ Page({
     })
   },
 
-  onLoad: function() {
+  onImageLoad: function() {
     console.log("图片已加载");
   },
 
