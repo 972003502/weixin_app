@@ -2,7 +2,6 @@ import table_Projuct from '../../database/table/product.js';
 import DataBaseObject from '../../database/DataBaseObject.js';
 
 let icons = [];
-let files = [];
 Page({
   onLoad() {
     // this.setData({
@@ -38,50 +37,38 @@ Page({
     })
   },
 
-  download() {
+  downloadImage: function () {
     let start = Date.now();
     wx.showLoading({
       title: '下载中'
     })
-    const that = this
-    wx.cloud.getTempFileURL({
-      fileList: icons,
-      success: res => {
-        files = res.fileList;
-      },
-      fail: console.error,
-      complete: () => {
-        let savedFilePaths = [];
-        let newImage;
-        let fileNums = 0;
-        for (let file of files) {
-          wx.downloadFile({
-            url: file.tempFileURL,
+    let fileNums = 0;
+    let savedFilePaths = [];
+    for (let icon of icons) {
+      wx.cloud.downloadFile({
+        fileID: icon,
+        success(res) {
+          wx.saveFile({
+            tempFilePath: res.tempFilePath,
             success(res) {
-              wx.saveFile({
-                tempFilePath: res.tempFilePath,
-                success(res) {
-                  savedFilePaths.push(res.savedFilePath);
-                  console.log("ok");
-                  wx.setStorageSync(`savedFilePath${fileNums}`, res.savedFilePath);
-                  fileNums += 1;
-                },
-                complete: () => {
-                  if (savedFilePaths.length == files.length) {
-                    let end = Date.now();
-                    wx.hideLoading();
-                    wx.showToast({
-                      title: '下载成功',
-                    })
-                    console.log("成功", `${end - start}ms`);
-                  }
-                }
-              })
+              savedFilePaths.push(res.savedFilePath);
+              wx.setStorageSync(`savedFilePath${fileNums}`, res.savedFilePath);
+              fileNums += 1;
+            },
+            complete: () => {
+              if (savedFilePaths.length == icons.length) {
+                let end = Date.now();
+                wx.hideLoading();
+                wx.showToast({
+                  title: '下载成功',
+                })
+                console.log("成功", `${end - start}ms`);
+              }
             }
           })
         }
-      }
-    })
+      })
+    }
   },
 
   clear() {

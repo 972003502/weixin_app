@@ -1,4 +1,4 @@
-<view class="page">
+<view class="page" wx:if="{{display}}">
   <view class="page__bd">
     <view wx:for="{{products}}" wx:for-item="classify" wx:key="classify">
       <view class="weui-cells__title">{{classify[0].classify}}</view>
@@ -6,7 +6,7 @@
 
         <view class="weui-cell" wx:for="{{classify}}" wx:for-item="product" wx:key="product._id">
           <view class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-            <image src="{{product.icon}}" class='product_icon' mode='aspectFill'/>
+            <image src="{{product.icon}}" class='product_icon' mode='aspectFill' bindload="onLoad"/>
           </view>
           <view class="weui-cell__bd">
             <view>{{product.name}}</view>

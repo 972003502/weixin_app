@@ -29,6 +29,7 @@ Page({
       }, wx.navigateBack({})
       )
     });
+
     // if (wx.canIUse('compressImage')) {
     //   this.cropper.getImg((imageObj) => {
     //     wx.compressImage({
@@ -37,7 +38,7 @@ Page({
     //       success: (res) => {
     //         let pages = getCurrentPages();
     //         let addProductPage = pages[pages.length - 2];
-    //         addProductPage.product.setFieidValue('icon', res.tempFilePath);
+    //         addProductPage.product.setValue('icon', res.tempFilePath);
     //         addProductPage.setData({
     //           imgList: [res.tempFilePath]
     //         }
