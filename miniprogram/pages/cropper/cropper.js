@@ -20,6 +20,7 @@ Page({
   },
 
   getImgSrc() {
+    //PC端测试使用，不支持图片压缩
     this.cropper.getImg((imageObj) => {
       let pages = getCurrentPages();
       let addProductPage = pages[pages.length - 2];
@@ -30,6 +31,7 @@ Page({
       )
     });
 
+    //手机端使用，支持图片压缩
     // if (wx.canIUse('compressImage')) {
     //   this.cropper.getImg((imageObj) => {
     //     wx.compressImage({
