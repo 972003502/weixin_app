@@ -3,7 +3,7 @@
     "pages/menu/menu",
     "pages/file/file",
     "pages/cropper/cropper",
-    "pages/productManagement/productManagement",
+    "pages/productManager/productManager",
     "pages/addProduct/addProduct",
     "pages/aboutme/aboutme",
     "pages/index/index",

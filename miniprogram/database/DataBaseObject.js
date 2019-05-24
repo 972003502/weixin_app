@@ -72,6 +72,7 @@ class DataBaseObject {
         obj.success(res);
       },
       fail: (e) => {
+        console.log(e);
         obj.fail(e);
       },
       complete: () => {
@@ -88,6 +89,7 @@ class DataBaseObject {
           callBackObj.success(res);
         },
         fail: (e) => {
+          console.log(e);
           callBackObj.fail(e);
         },
         complete: () => {
