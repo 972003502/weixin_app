@@ -26,8 +26,9 @@
   </view>
 </view> -->
 
-<image src="{{savedFilePath}}" class="image" mode="aspectFit"></image>
+<image src="{{product_icon}}" class="image" mode="aspectFit"></image>
 
-<button type="primary" bindtap="downloadImage">缓存文件</button>
-<button type="primary" bindtap="getSavedFileInfo">查看文件</button>
-<button bindtap="clear">删除文件</button>
+<button type="primary" bindtap="downloadImage" style='margin:10px;'>下载文件</button>
+<button type="primary" bindtap="cacheImage" style='margin:10px;'>缓存文件</button>
+<button type="primary" bindtap="getSavedFileInfo" style='margin:10px;'>查看文件</button>
+<button type="warn" bindtap="clear" style='margin:10px;'>删除文件</button>
