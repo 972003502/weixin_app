@@ -42,12 +42,23 @@ Page({
 
   downloadImage: function () {
     let start = Date.now();
+    // wx.showLoading({
+    //   title: '下载中'
+    // })
     for (let icon of icons) {
+      // wx.cloud.downloadFile({
+      //   fileID: icon,
+      //   success(res) {
+      //     tempFilePaths.push(res.tempFilePath);
+      //   }
+      // })
       wx.cloud.downloadFile({
-        fileID: icon,
-        success(res) {
-          tempFilePaths.push(res.tempFilePath);
-        }
+        fileID: icon
+      }).then(res => {
+        tempFilePaths.push(res.tempFilePath);
+        console.log(res.tempFilePath)
+      }).catch(error => {
+        // handle error
       })
     }
     console.log("下载完成", tempFilePaths);
@@ -55,6 +66,9 @@ Page({
 
   cacheImage: function () {
     let start = Date.now();
+    wx.showLoading({
+      title: '缓存中'
+    })
     this.fileManager.saveFile({
       tempFilePaths: tempFilePaths,
       fileKey: (item) => {
@@ -64,11 +78,16 @@ Page({
       complete: () => {
         let end = Date.now();
         console.log("耗时", `${end - start}ms`);
+        wx.hideLoading();
         // this.setData({
         //   product_icon: wx.getStorageSync('product_icon_1558513044004.jpg')
         // })
       }
     })
+  },
+
+  clear: function() {
+    this.fileManager.clearFile({});
   }
 
   // downloadImage: function () {
