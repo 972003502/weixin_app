@@ -1,6 +1,8 @@
 import table_Projuct from '../../database/table/product.js';
 import DataBaseObject from '../../database/DataBaseObject.js';
 import FileManager from '../../module/fileManager/fileManager.js';
+import regeneratorRuntime from '../../module/regenerator-runtime/runtime.js';
+
 
 let icons = [];
 //let fileManager = wx.getFileSystemManager(); //创建文件管理器
@@ -40,26 +42,49 @@ Page({
     })
   },
 
+  download(url, num) {
+    wx.cloud.downloadFile({
+      fileID: url
+    }).then(res => {
+      num
+      tempFilePaths.push(res.tempFilePath);
+      console.log(0, res.tempFilePath)
+    })
+  },
+
+
   downloadImage: function () {
-    let start = Date.now();
+    // let start = Date.now();
 
-    for (let icon of icons) {
-      // wx.cloud.downloadFile({
-      //   fileID: icon,
-      //   success(res) {
-      //     tempFilePaths.push(res.tempFilePath);
-      //     console.log(icons.indexOf(icon), res.tempFilePath);
-      //   }
-      // })
+    // for (let icon of icons) {
+    //   // wx.cloud.downloadFile({
+    //   //   fileID: icon,
+    //   //   success(res) {
+    //   //     tempFilePaths.push(res.tempFilePath);
+    //   //     console.log(icons.indexOf(icon), res.tempFilePath);
+    //   //   }
+    //   // })
 
-      wx.cloud.downloadFile({
-        fileID: icon
-      }).then(res => {
-        tempFilePaths.push(res.tempFilePath);
-        console.log(icons.indexOf(icon), res.tempFilePath)
-      })
+
+    // wx.cloud.downloadFile({
+    //   fileID: icons[0]
+    // }).then(res => {
+    //   tempFilePaths.push(res.tempFilePath);
+    //   console.log(0, res.tempFilePath)
+    // })
+    //console.log("下载完成", tempFilePaths);
+
+    let arr = [];
+    async function testResult() {
+      for (let icon of icons) {
+        let url = await wx.cloud.downloadFile({
+          fileID: icon
+        });
+        arr.push(url.tempFilePath);
+        console.log("执行", icons.indexOf(icon), url.tempFilePath);
+      }
     }
-    console.log("下载完成", tempFilePaths);
+    testResult();
   },
 
   cacheImage: function () {

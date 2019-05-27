@@ -23,6 +23,15 @@ class FileManager {
     return this._storageKeys;
   }
 
+  // download() {
+  //   wx.cloud.downloadFile({
+  //     fileID: icon
+  //   }).then(res => {
+  //     tempFilePaths.push(res.tempFilePath);
+  //     console.log(icons.indexOf(icon), res.tempFilePath)
+  //   })
+  // }
+
   saveFile(obj) {
     let callBack = {
       success: obj.success || function () { },
