@@ -42,23 +42,21 @@ Page({
 
   downloadImage: function () {
     let start = Date.now();
-    // wx.showLoading({
-    //   title: '下载中'
-    // })
+
     for (let icon of icons) {
       // wx.cloud.downloadFile({
       //   fileID: icon,
       //   success(res) {
       //     tempFilePaths.push(res.tempFilePath);
+      //     console.log(icons.indexOf(icon), res.tempFilePath);
       //   }
       // })
+
       wx.cloud.downloadFile({
         fileID: icon
       }).then(res => {
         tempFilePaths.push(res.tempFilePath);
-        console.log(res.tempFilePath)
-      }).catch(error => {
-        // handle error
+        console.log(icons.indexOf(icon), res.tempFilePath)
       })
     }
     console.log("下载完成", tempFilePaths);
@@ -86,7 +84,7 @@ Page({
     })
   },
 
-  clear: function() {
+  clear: function () {
     this.fileManager.clearFile({});
   }
 
