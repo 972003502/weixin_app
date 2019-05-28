@@ -1,11 +1,8 @@
 import table_Projuct from '../../database/table/product.js';
 import DataBaseObject from '../../database/DataBaseObject.js';
 import FileManager from '../../module/fileManager/fileManager.js';
-import regeneratorRuntime from '../../module/regenerator-runtime/runtime.js';
-
 
 let icons = [];
-//let fileManager = wx.getFileSystemManager(); //创建文件管理器
 let tempFilePaths = [];
 Page({
   onLoad() {
@@ -42,71 +39,59 @@ Page({
     })
   },
 
-  download(url, num) {
-    wx.cloud.downloadFile({
-      fileID: url
-    }).then(res => {
-      num
-      tempFilePaths.push(res.tempFilePath);
-      console.log(0, res.tempFilePath)
-    })
-  },
-
-
   downloadImage: function () {
-    // let start = Date.now();
-
-    // for (let icon of icons) {
-    //   // wx.cloud.downloadFile({
-    //   //   fileID: icon,
-    //   //   success(res) {
-    //   //     tempFilePaths.push(res.tempFilePath);
-    //   //     console.log(icons.indexOf(icon), res.tempFilePath);
-    //   //   }
-    //   // })
-
-
-    // wx.cloud.downloadFile({
-    //   fileID: icons[0]
-    // }).then(res => {
-    //   tempFilePaths.push(res.tempFilePath);
-    //   console.log(0, res.tempFilePath)
-    // })
-    //console.log("下载完成", tempFilePaths);
-
-    let arr = [];
-    async function testResult() {
-      for (let icon of icons) {
-        let url = await wx.cloud.downloadFile({
-          fileID: icon
-        });
-        arr.push(url.tempFilePath);
-        console.log("执行", icons.indexOf(icon), url.tempFilePath);
+    wx.showLoading({
+      title: '下载中'
+    })
+    this.fileManager.downloadSync({
+      tempFilePaths: icons,
+      success: (res, path) => {
+        tempFilePaths.push(res.tempFilePath);
+        console.log("执行", icons.indexOf(path), res);
+      },
+      complete: () => {
+        console.log(tempFilePaths);
+        wx.hideLoading();
+        wx.showToast({
+          title: '下载成功',
+        })
       }
-    }
-    testResult();
+    });
   },
 
   cacheImage: function () {
-    let start = Date.now();
-    wx.showLoading({
-      title: '缓存中'
-    })
-    this.fileManager.saveFile({
+    // let start = Date.now();
+    // wx.showLoading({
+    //   title: '缓存中'
+    // })
+    // this.fileManager.saveFile({
+    //   tempFilePaths: tempFilePaths,
+    //   fileKey: (item) => {
+    //     let tempUrl = icons[tempFilePaths.indexOf(item)];
+    //     return tempUrl.slice(tempUrl.indexOf('product_icon'));
+    //   },
+    //   complete: () => {
+    //     let end = Date.now();
+    //     console.log("耗时", `${end - start}ms`);
+    //     wx.hideLoading();
+    //     // this.setData({
+    //     //   product_icon: wx.getStorageSync('product_icon_1558513044004.jpg')
+    //     // })
+    //   }
+    // })
+    
+    this.fileManager.saveFileSync({
       tempFilePaths: tempFilePaths,
-      fileKey: (item) => {
-        let tempUrl = icons[tempFilePaths.indexOf(item)];
-        return tempUrl.slice(tempUrl.indexOf('product_icon'));
-      },
-      complete: () => {
-        let end = Date.now();
-        console.log("耗时", `${end - start}ms`);
-        wx.hideLoading();
-        // this.setData({
-        //   product_icon: wx.getStorageSync('product_icon_1558513044004.jpg')
-        // })
+      success: (res, path) => {
+        let fileID = path.slice(path.indexOf('product_icon'));
+        wx.setStorageSync(`${fileID}`, res.savedFilePath);
+        console.log(fileID);
       }
     })
+  },
+
+  getSavedFile: function() {
+    this.fileManager.getSavedFileInfo({});
   },
 
   clear: function () {
@@ -147,20 +132,4 @@ Page({
   //     })
   //   }
   // },
-
-  // getSavedFileInfo: function () {
-  //   let fileSize = 0;
-  //   fileManager.getSavedFileList({
-  //     success: (res) => {
-  //       for (let file of res.fileList) {
-  //         fileSize += file.size
-  //         console.log(file);
-  //       }
-  //       this.setData({
-  //         savedFilePath: res.fileList[1].filePath
-  //       });
-  //       console.log("缓存大小", `${fileSize / 1000}KB`);
-  //     }
-  //   })
-  // }
 })

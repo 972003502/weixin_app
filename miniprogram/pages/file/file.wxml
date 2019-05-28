@@ -30,5 +30,5 @@
 
 <button type="primary" bindtap="downloadImage" style='margin:10px;'>下载文件</button>
 <button type="primary" bindtap="cacheImage" style='margin:10px;'>缓存文件</button>
-<button type="primary" bindtap="getSavedFileInfo" style='margin:10px;'>查看文件</button>
+<button type="primary" bindtap="getSavedFile" style='margin:10px;'>查看文件</button>
 <button type="warn" bindtap="clear" style='margin:10px;'>删除文件</button>
