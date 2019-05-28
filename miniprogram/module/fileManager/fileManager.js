@@ -1,32 +1,22 @@
 import regeneratorRuntime from '../../module/regenerator-runtime/runtime.js';
+import promisify from '../promisify/promisify.js';
 
 class FileManager {
   constructor() {
     this._fileMgr = wx.getFileSystemManager();
-    this._fileList = [];
-    this._fileSize = 0;
-    this._filePaths = [];
-    this._createTime = []
+    this._filesInfo = {
+      list: [],
+      paths: [],
+      size: 0
+    };
   }
 
   get fileMgr() {
     return this._fileMgr;
   }
 
-  get fileSize() {
-    return this._fileSize;
-  }
-
-  get filePaths() {
-    return this._filePaths;
-  }
-
-  get createTime() {
-    return this._createTime;
-  }
-
-  get storageKeys() {
-    return this._storageKeys;
+  get filesInfo() {
+    return this._filesInfo;
   }
 
   async downloadSync(obj) {
@@ -52,29 +42,8 @@ class FileManager {
     callBack.completeAll();
   }
 
-  promisify(f, manyArgs = false) {
-    return function (...args) {
-      return new Promise((resolve, reject) => {
-        function callback(err, ...results) { // our custom callback for f
-          if (err) {
-            return reject(err);
-          } else {
-            // resolve with all callback results if manyArgs is specified
-            resolve(manyArgs ? results : results[0]);
-          }
-        }
-
-        args.push(callback);
-
-        f.call(this, ...args);
-      });
-    };
-  };
-
-
   async saveFileSync(obj) {
-    let newSaveFileFunc = this.promisify(this._fileMgr.saveFile);
-    console.log("测试");
+    let saveFilePromise = promisify(this._fileMgr.saveFile);
     let callBack = {
       success: obj.success || function () { },
       fail: obj.fail || function () { },
@@ -83,9 +52,9 @@ class FileManager {
     }
     for (let path of obj.tempFilePaths) {
       try {
-        let res = await newSaveFileFunc(null, path, '1');
-        console.log(res);
-        this._filePaths.push(res.savedFilePath);
+        let res = await saveFilePromise({
+          tempFilePath: path
+        });
         callBack.success(res, path);
       } catch (err) {
         console.log(err);
@@ -97,40 +66,6 @@ class FileManager {
     callBack.completeAll();
   }
 
-  // saveFile(obj) {
-  //   let callBack = {
-  //     success: obj.success || function () { },
-  //     fail: obj.fail || function () { },
-  //     complete: obj.complete || function () { }
-  //   }
-  //   for (let path of obj.tempFilePaths) {
-  //     this._fileMgr.saveFile({
-  //       tempFilePath: path,
-  //       success: (res) => {
-  //         this._filePaths.push(res.savedFilePath);
-  //         wx.setStorageSync(`${obj.fileKey(path)}`, res.savedFilePath);
-  //         callBack.success(res);
-  //       },
-  //       fail: (e) => {
-  //         console.log(e);
-  //         callBack.fail(e);
-  //       },
-  //       complete: () => {
-  //         if (obj.times == "single") {
-  //           console.log(obj.tempFilePaths, "save single success");
-  //           callBack.complete();
-  //         }
-  //         else {
-  //           if (this._filePaths.length == obj.tempFilePaths.length) {
-  //             console.log(obj.tempFilePaths, "save all success");
-  //             callBack.complete();
-  //           }
-  //         }
-  //       }
-  //     })
-  //   }
-  // }
-
   getSavedFileInfo(obj) {
     let callBack = {
       success: obj.success || function () { },
@@ -139,11 +74,10 @@ class FileManager {
     }
     this._fileMgr.getSavedFileList({
       success: (res) => {
-        this._fileList = res.fileList
+        this._filesInfo.list = res.fileList;
         for (let file of res.fileList) {
-          this._filePaths.push(file.filePath);
-          this._fileSize += file.size;
-          this._createTime.push(file.createTime);
+          this._filesInfo.paths.push(file.filePath);
+          this._filesInfo.size += file.size;
         }
         callBack.success(res);
       },
@@ -152,61 +86,89 @@ class FileManager {
         callBack.fail(e);
       },
       complete: () => {
-        console.log("缓存大小", `${this._fileSize / 1000}KB`);
-        console.log("缓存路径", this._filePaths);
+        console.log("缓存大小", `${this._filesInfo.size / 1000}KB`);
+        console.log("缓存路径", this._filesInfo.paths);
         callBack.complete();
       }
     })
   }
 
-  clearFile(obj) {
+  async clearFile(obj) {
+    let removeFilePromise = promisify(this._fileMgr.removeSavedFile);
     let callBack = {
       success: obj.success || function () { },
       fail: obj.fail || function () { },
-      complete: obj.complete || function () { }
+      complete: obj.complete || function () { },
+      completeAll: obj.completeAll || function () { }
     }
-    if (obj.fileKeys || false) {
-      for (let fileKey of obj.fileKeys) {
-        this._fileMgr.removeSavedFile({
-          filePath: wx.getStorageSync(fileKey),
-          success: (res) => {
-            wx.removeStorageSync(fileKey);
-            console.log(`clear ${fileKey} success`);
-            callBack.success(res);
-          },
-          fail: (e) => {
-            console.log(e);
-            callBack.fail(e);
-          },
-          complete: () => {
-            callBack.complete();
-          }
-        })
-      }
-    } else {
-      this._fileList = [];
-      this._fileSize = 0;
-      this._filePaths = [];
-      this._createTime = [];
-      wx.clearStorageSync();
-      for (let path of this._filePaths) {
-        this._fileMgr.removeSavedFile({
-          filePath: path,
-          success: (res) => {
-            console.log("clear all success");
-            callBack.success(res);
-          },
-          fail: (e) => {
-            console.log(e);
-            callBack.fail(e);
-          },
-          complete: () => {
-            callBack.complete();
-          }
-        })
+    for (let path of this._filesInfo.paths) {
+      try {
+        await removeFilePromise({
+          filePath: path
+        });
+        callBack.success(path);
+      } catch (err) {
+        console.log(err);
+        callBack.fail(err);
+      } finally {
+        callBack.complete();
       }
     }
+    this._filesInfo = {
+      list: [],
+      paths: [],
+      size: 0
+    };
+    callBack.completeAll();
   }
+
+  // clearFile(obj) {
+  //   let callBack = {
+  //     success: obj.success || function () { },
+  //     fail: obj.fail || function () { },
+  //     complete: obj.complete || function () { }
+  //   }
+  //   if (obj.fileKeys || false) {
+  //     for (let fileKey of obj.fileKeys) {
+  //       this._fileMgr.removeSavedFile({
+  //         filePath: wx.getStorageSync(fileKey),
+  //         success: (res) => {
+  //           wx.removeStorageSync(fileKey);
+  //           console.log(`clear ${fileKey} success`);
+  //           callBack.success(res);
+  //         },
+  //         fail: (e) => {
+  //           console.log(e);
+  //           callBack.fail(e);
+  //         },
+  //         complete: () => {
+  //           callBack.complete();
+  //         }
+  //       })
+  //     }
+  //   } else {
+  //     this._fileList = [];
+  //     this._filePaths = [];
+  //     this._createTime = [];
+  //     wx.clearStorageSync();
+  //     for (let path of this._filePaths) {
+  //       this._fileMgr.removeSavedFile({
+  //         filePath: path,
+  //         success: (res) => {
+  //           console.log("clear all success");
+  //           callBack.success(res);
+  //         },
+  //         fail: (e) => {
+  //           console.log(e);
+  //           callBack.fail(e);
+  //         },
+  //         complete: () => {
+  //           callBack.complete();
+  //         }
+  //       })
+  //     }
+  //   }
+  // }
 }
 
 export default FileManager;

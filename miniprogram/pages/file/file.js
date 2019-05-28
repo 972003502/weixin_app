@@ -40,6 +40,7 @@ Page({
   },
 
   downloadImage: function () {
+    let start = Date.now();
     wx.showLoading({
       title: '下载中'
     })
@@ -50,7 +51,8 @@ Page({
         console.log("执行", icons.indexOf(path), res.tempFilePath);
       },
       completeAll: () => {
-        console.log(tempFilePaths);
+        let end = Date.now();
+        console.log("耗时", `${end - start}ms`);
         wx.hideLoading();
         wx.showToast({
           title: '下载成功',
@@ -60,42 +62,32 @@ Page({
   },
 
   cacheImage: function () {
-    // let start = Date.now();
-    // wx.showLoading({
-    //   title: '缓存中'
-    // })
-    // this.fileManager.saveFile({
-    //   tempFilePaths: tempFilePaths,
-    //   fileKey: (item) => {
-    //     let tempUrl = icons[tempFilePaths.indexOf(item)];
-    //     return tempUrl.slice(tempUrl.indexOf('product_icon'));
-    //   },
-    //   complete: () => {
-    //     let end = Date.now();
-    //     console.log("耗时", `${end - start}ms`);
-    //     wx.hideLoading();
-    //     // this.setData({
-    //     //   product_icon: wx.getStorageSync('product_icon_1558513044004.jpg')
-    //     // })
-    //   }
-    // })
-    
     this.fileManager.saveFileSync({
       tempFilePaths: tempFilePaths,
       success: (res, path) => {
-        let fileID = path.slice(path.indexOf('product_icon'));
+        let tempUrl = icons[tempFilePaths.indexOf(path)];
+        let fileID = tempUrl.slice(tempUrl.indexOf('product_icon'));
         wx.setStorageSync(`${fileID}`, res.savedFilePath);
         console.log(fileID);
       }
     })
   },
 
-  getSavedFile: function() {
+  getSavedFile: function () {
     this.fileManager.getSavedFileInfo({});
+    console.log(wx.getStorageInfoSync());
+    // this.setData({
+    //   product_icon: wx.getStorageSync('product_icon_1558513044004.jpg')
+    // })
   },
 
   clear: function () {
-    this.fileManager.clearFile({});
+    this.fileManager.clearFile({
+      completeAll: () => {
+        wx.clearStorageSync();
+        console.log("clear all success");
+      }
+    });
   }
 
   // downloadImage: function () {
