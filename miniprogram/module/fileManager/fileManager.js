@@ -33,7 +33,8 @@ class FileManager {
     let callBack = {
       success: obj.success || function () { },
       fail: obj.fail || function () { },
-      complete: obj.complete || function () { }
+      complete: obj.complete || function () { },
+      completeAll: obj.completeAll || function () { }
     }
     for (let path of obj.tempFilePaths) {
       try {
@@ -44,31 +45,56 @@ class FileManager {
       } catch (err) {
         console.log(err);
         callBack.fail(err);
+      } finally {
+        callBack.complete();
       }
     }
-    callBack.complete();
+    callBack.completeAll();
   }
 
+  promisify(f, manyArgs = false) {
+    return function (...args) {
+      return new Promise((resolve, reject) => {
+        function callback(err, ...results) { // our custom callback for f
+          if (err) {
+            return reject(err);
+          } else {
+            // resolve with all callback results if manyArgs is specified
+            resolve(manyArgs ? results : results[0]);
+          }
+        }
+
+        args.push(callback);
+
+        f.call(this, ...args);
+      });
+    };
+  };
+
+
   async saveFileSync(obj) {
+    let newSaveFileFunc = this.promisify(this._fileMgr.saveFile);
+    console.log("测试");
     let callBack = {
       success: obj.success || function () { },
       fail: obj.fail || function () { },
-      complete: obj.complete || function () { }
+      complete: obj.complete || function () { },
+      completeAll: obj.completeAll || function () { }
     }
     for (let path of obj.tempFilePaths) {
       try {
-        let res = await this._fileMgr.saveFile({
-          tempFilePath: path
-        });
-        console.log(res)
+        let res = await newSaveFileFunc(null, path, '1');
+        console.log(res);
         this._filePaths.push(res.savedFilePath);
         callBack.success(res, path);
       } catch (err) {
         console.log(err);
         callBack.fail(err);
+      } finally {
+        callBack.complete();
       }
     }
-    callBack.complete();
+    callBack.completeAll();
   }
 
   // saveFile(obj) {

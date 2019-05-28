@@ -25,7 +25,7 @@ Page({
           imageList.push(obj.icon);
         }
         icons = imageList
-        console.log("云链接", icons);
+        //console.log("云链接", icons);
       },
       fail: (e) => {
         wx.showToast({
@@ -47,9 +47,9 @@ Page({
       tempFilePaths: icons,
       success: (res, path) => {
         tempFilePaths.push(res.tempFilePath);
-        console.log("执行", icons.indexOf(path), res);
+        console.log("执行", icons.indexOf(path), res.tempFilePath);
       },
-      complete: () => {
+      completeAll: () => {
         console.log(tempFilePaths);
         wx.hideLoading();
         wx.showToast({
