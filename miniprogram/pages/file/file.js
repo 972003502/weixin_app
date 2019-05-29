@@ -48,7 +48,7 @@ Page({
       tempFilePaths: icons,
       success: (res, path) => {
         tempFilePaths.push(res.tempFilePath);
-        console.log("执行", icons.indexOf(path), res.tempFilePath);
+        console.log("执行", icons.indexOf(path), path);
       },
       completeAll: () => {
         let end = Date.now();

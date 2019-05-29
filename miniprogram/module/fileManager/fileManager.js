@@ -9,6 +9,7 @@ class FileManager {
       paths: [],
       size: 0
     };
+    this.getStorageInfoSync();
   }
 
   get fileMgr() {
@@ -17,6 +18,15 @@ class FileManager {
 
   get filesInfo() {
     return this._filesInfo;
+  }
+
+  getStorageInfoSync() {
+    this._filesInfo.paths = [];
+    let res = wx.getStorageInfoSync();
+    for (let key of res.keys) {
+      let value = wx.getStorageSync(key);
+      this._filesInfo.paths.push(value);
+    }
   }
 
   async downloadSync(obj) {
@@ -67,6 +77,11 @@ class FileManager {
   }
 
   getSavedFileInfo(obj) {
+    this._filesInfo = {
+      list: [],
+      paths: [],
+      size: 0
+    };
     let callBack = {
       success: obj.success || function () { },
       fail: obj.fail || function () { },
@@ -101,24 +116,36 @@ class FileManager {
       complete: obj.complete || function () { },
       completeAll: obj.completeAll || function () { }
     }
-    for (let path of this._filesInfo.paths) {
-      try {
-        await removeFilePromise({
-          filePath: path
-        });
-        callBack.success(path);
-      } catch (err) {
-        console.log(err);
-        callBack.fail(err);
-      } finally {
-        callBack.complete();
+    if (obj.fileKeys || false) {
+      for (let fileKey of obj.fileKeys) {
+        try {
+          await removeFilePromise({
+            filePath: wx.getStorageSync(fileKey)
+          });
+          callBack.success(path);
+        } catch (err) {
+          console.log(err);
+          callBack.fail(err);
+        } finally {
+          callBack.complete();
+        }
+      }   
+    } else {
+      this.getStorageInfoSync();
+      for (let path of this._filesInfo.paths) {
+        try {
+          await removeFilePromise({
+            filePath: path
+          });
+          callBack.success(path);
+        } catch (err) {
+          console.log(err);
+          callBack.fail(err);
+        } finally {
+          callBack.complete();
+        }
       }
-    }
-    this._filesInfo = {
-      list: [],
-      paths: [],
-      size: 0
-    };
+    }  
     callBack.completeAll();
   }
 
