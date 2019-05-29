@@ -89,6 +89,7 @@ Page({
   clear: function () {
     this.fileManager.clearFile({
       completeAll: () => {
+        this.fileManager.syncToGlobalStorage();
         console.log("clear all success");
       }
     });

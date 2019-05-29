@@ -4,6 +4,8 @@ import promisify from '../promisify/promisify.js';
 class FileManager {
   constructor() {
     this._fileMgr = wx.getFileSystemManager();
+    this._innerStorageAdd = new Map();
+    this._innerStorageRemove = new Map();
     this._filesInfo = {
       list: [],
       paths: [],
@@ -12,6 +14,7 @@ class FileManager {
     this._storageInfo = {
       keys: [],
       values: [],
+      map: new Map(),
       currentSize: 0,
       limitSize: 0
     };
@@ -30,15 +33,29 @@ class FileManager {
     return this._storageInfo;
   }
 
+  syncToGlobalStorage() {
+    for (let innerStorage of this._innerStorageAdd) {
+      wx.setStorageSync(innerStorage[0], innerStorage[1]);
+    }
+    for (let innerStorage of this._innerStorageRemove) {
+      wx.removeStorageSync(innerStorage[0]);
+    }
+    this._innerStorageAdd.clear();
+    this._innerStorageRemove.clear();
+    this.getStorageInfoSync();
+  }
+
   getStorageInfoSync() {
     let res = wx.getStorageInfoSync();
     this._storageInfo.values = [];
+    this._storageInfo.map.clear();
     this._storageInfo.keys = res.keys;
     this._storageInfo.currentSize = res.currentSize;
     this._storageInfo.limitSize = res.limitSize;
     for (let key of res.keys) {
       let value = wx.getStorageSync(key);
       this._storageInfo.values.push(value);
+      this._storageInfo.map.set(key, value);
     }
   }
 
@@ -54,7 +71,8 @@ class FileManager {
         let res = await wx.cloud.downloadFile({
           fileID: path
         });
-        callBack.success(res, path);
+        this._innerStorageAdd.set(path, res.tempFilePath);
+        callBack.success(res);
       } catch (err) {
         console.log(err);
         callBack.fail(err);
@@ -73,17 +91,36 @@ class FileManager {
       complete: obj.complete || function () { },
       completeAll: obj.completeAll || function () { }
     }
-    for (let path of obj.tempFilePaths) {
-      try {
-        let res = await saveFilePromise({
-          tempFilePath: path
-        });
-        callBack.success(res, path);
-      } catch (err) {
-        console.log(err);
-        callBack.fail(err);
-      } finally {
-        callBack.complete();
+    if (obj.tempFilePaths || false) {
+      for (let path of obj.tempFilePaths) {
+        try {
+          let newPath = path;
+          let res = await saveFilePromise({
+            tempFilePath: path
+          });
+          this._innerStorageAdd.set(newPath, res.savedFilePath);
+          callBack.success(res);
+        } catch (err) {
+          console.log(err);
+          callBack.fail(err);
+        } finally {
+          callBack.complete();
+        }
+      }
+    } else {
+      for (let innerStorage of this._innerStorageAdd) {
+        try {
+          let res = await saveFilePromise({
+            tempFilePath: innerStorage[1]
+          });
+          this._innerStorageAdd.set(innerStorage[0], res.savedFilePath);
+          callBack.success(res);
+        } catch (err) {
+          console.log(err);
+          callBack.fail(err);
+        } finally {
+          callBack.complete();
+        }
       }
     }
     callBack.completeAll();
@@ -130,12 +167,13 @@ class FileManager {
     if (obj.fileKeys || false) {
       for (let fileKey of obj.fileKeys) {
         try {
-          let path = wx.getStorageSync(fileKey);
+          let path = this._innerStorageAdd.get(fileKey) || this._storageInfo.map.get(fileKey);
           await removeFilePromise({
             filePath: path
           });
-          wx.removeStorageSync(fileKey);
-          callBack.success(path);
+          this._innerStorageAdd.delete(fileKey);
+          this._innerStorageRemove.set(fileKey, path);
+          callBack.success();
         } catch (err) {
           console.log(err);
           callBack.fail(err);
@@ -144,13 +182,13 @@ class FileManager {
         }
       }
     } else {
-      this.getStorageInfoSync();
-      for (let path of this._storageInfo.values) {
+      for (let storageMap of this._storageInfo.map) {
         try {
           await removeFilePromise({
-            filePath: path
+            filePath: storageMap[1]
           });
-          callBack.success(path);
+          this._innerStorageRemove.set(storageMap[0], storageMap[1]);
+          callBack.success();
         } catch (err) {
           console.log(err);
           callBack.fail(err);
@@ -158,10 +196,9 @@ class FileManager {
           callBack.complete();
         }
       }
-      wx.clearStorageSync();
+      this._innerStorageAdd.clear();
     }
     this.getSavedFileInfo({});
-    this.getStorageInfoSync();
     callBack.completeAll();
   }
 }
