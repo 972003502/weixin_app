@@ -74,7 +74,12 @@ Page({
   },
 
   getSavedFile: function () {
-    this.fileManager.getSavedFileInfo({});
+    this.fileManager.getSavedFileInfo({
+      complete: () => {
+        console.log("缓存大小", `${this.fileManager.filesInfo.size / 1000}KB`);
+        console.log("缓存路径", this.fileManager.filesInfo.paths);
+      }
+    });
     console.log(wx.getStorageInfoSync());
     // this.setData({
     //   product_icon: wx.getStorageSync('product_icon_1558513044004.jpg')
@@ -84,7 +89,6 @@ Page({
   clear: function () {
     this.fileManager.clearFile({
       completeAll: () => {
-        wx.clearStorageSync();
         console.log("clear all success");
       }
     });
