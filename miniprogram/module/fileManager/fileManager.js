@@ -4,8 +4,9 @@ import promisify from '../promisify/promisify.js';
 class FileManager {
   constructor() {
     this._fileMgr = wx.getFileSystemManager();
-    this._innerStorageAdd = new Map();
-    this._innerStorageRemove = new Map();
+    this._storageAdd = new Map();
+    this._storageRemove = new Map();
+    this._downloadMap = new Map();
     this._filesInfo = {
       list: [],
       paths: [],
@@ -34,14 +35,14 @@ class FileManager {
   }
 
   syncToGlobalStorage() {
-    for (let innerStorage of this._innerStorageAdd) {
-      wx.setStorageSync(innerStorage[0], innerStorage[1]);
+    for (let storage of this._storageAdd) {
+      wx.setStorageSync(storage[0], storage[1]);
     }
-    for (let innerStorage of this._innerStorageRemove) {
-      wx.removeStorageSync(innerStorage[0]);
+    for (let storage of this._storageRemove) {
+      wx.removeStorageSync(storage[0]);
     }
-    this._innerStorageAdd.clear();
-    this._innerStorageRemove.clear();
+    this._storageAdd.clear();
+    this._storageRemove.clear();
     this.getStorageInfoSync();
   }
 
@@ -71,7 +72,7 @@ class FileManager {
         let res = await wx.cloud.downloadFile({
           fileID: path
         });
-        this._innerStorageAdd.set(path, res.tempFilePath);
+        this._downloadMap.set(path, res.tempFilePath);
         callBack.success(res);
       } catch (err) {
         console.log(err);
@@ -94,11 +95,11 @@ class FileManager {
     if (obj.tempFilePaths || false) {
       for (let path of obj.tempFilePaths) {
         try {
-          let newPath = path;
+          let newKey = obj.setKey(path);
           let res = await saveFilePromise({
             tempFilePath: path
           });
-          this._innerStorageAdd.set(newPath, res.savedFilePath);
+          this._storageAdd.set(newKey, res.savedFilePath);
           callBack.success(res);
         } catch (err) {
           console.log(err);
@@ -108,12 +109,13 @@ class FileManager {
         }
       }
     } else {
-      for (let innerStorage of this._innerStorageAdd) {
+      for (let entry of this._downloadMap) {
         try {
+          let newKey = obj.setKey(entry[0]);
           let res = await saveFilePromise({
-            tempFilePath: innerStorage[1]
+            tempFilePath: entry[1]
           });
-          this._innerStorageAdd.set(innerStorage[0], res.savedFilePath);
+          this._storageAdd.set(newKey, res.savedFilePath);
           callBack.success(res);
         } catch (err) {
           console.log(err);
@@ -123,6 +125,7 @@ class FileManager {
         }
       }
     }
+    this._downloadMap.clear();
     callBack.completeAll();
   }
 
@@ -167,12 +170,12 @@ class FileManager {
     if (obj.fileKeys || false) {
       for (let fileKey of obj.fileKeys) {
         try {
-          let path = this._innerStorageAdd.get(fileKey) || this._storageInfo.map.get(fileKey);
+          let path = this._storageAdd.get(fileKey) || this._storageInfo.map.get(fileKey);
           await removeFilePromise({
             filePath: path
           });
-          this._innerStorageAdd.delete(fileKey);
-          this._innerStorageRemove.set(fileKey, path);
+          this._storageAdd.delete(fileKey);
+          this._storageRemove.set(fileKey, path);
           callBack.success();
         } catch (err) {
           console.log(err);
@@ -182,12 +185,16 @@ class FileManager {
         }
       }
     } else {
-      for (let storageMap of this._storageInfo.map) {
+      let removeMap = this._storageInfo.map;
+      for (let entry of this._storageAdd) {
+        removeMap.set(entry[0], entry[1]);
+      }
+      for (let entry of removeMap) {
         try {
           await removeFilePromise({
-            filePath: storageMap[1]
+            filePath: entry[1]
           });
-          this._innerStorageRemove.set(storageMap[0], storageMap[1]);
+          this._storageRemove.set(entry[0], entry[1]);
           callBack.success();
         } catch (err) {
           console.log(err);
@@ -196,7 +203,7 @@ class FileManager {
           callBack.complete();
         }
       }
-      this._innerStorageAdd.clear();
+      this._storageAdd.clear();
     }
     this.getSavedFileInfo({});
     callBack.completeAll();

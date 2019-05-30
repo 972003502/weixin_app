@@ -46,10 +46,6 @@ Page({
     })
     this.fileManager.downloadSync({
       tempFilePaths: icons,
-      success: (res, path) => {
-        tempFilePaths.push(res.tempFilePath);
-        console.log("执行", icons.indexOf(path), path);
-      },
       completeAll: () => {
         let end = Date.now();
         console.log("耗时", `${end - start}ms`);
@@ -62,13 +58,17 @@ Page({
   },
 
   cacheImage: function () {
+    let fileID;
     this.fileManager.saveFileSync({
-      tempFilePaths: tempFilePaths,
-      success: (res, path) => {
-        let tempUrl = icons[tempFilePaths.indexOf(path)];
-        let fileID = tempUrl.slice(tempUrl.indexOf('product_icon'));
-        wx.setStorageSync(`${fileID}`, res.savedFilePath);
+      setKey: (value) => {
+        fileID = value.slice(value.indexOf('product_icon'));
+        return fileID;
+      },
+      success: (res) => {
         console.log(fileID);
+      },
+      completeAll: () => {
+        this.fileManager.syncToGlobalStorage();
       }
     })
   },
