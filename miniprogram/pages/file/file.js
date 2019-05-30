@@ -68,7 +68,7 @@ Page({
         console.log(fileID);
       },
       completeAll: () => {
-        this.fileManager.syncToGlobalStorage();
+        //this.fileManager.syncToGlobalStorage();
       }
     })
   },
