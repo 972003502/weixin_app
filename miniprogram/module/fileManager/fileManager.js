@@ -20,6 +20,7 @@ class FileManager {
       limitSize: 0
     };
     this.getStorageInfoSync();
+    this.getSavedFileInfo({});
   }
 
   get fileMgr() {
@@ -41,7 +42,7 @@ class FileManager {
     for (let storage of this._storageRemove) {
       wx.removeStorageSync(storage[0]);
     }
-    this._storageAdd.clear();
+    //this._storageAdd.clear();
     this._storageRemove.clear();
     this.getStorageInfoSync();
   }
@@ -96,6 +97,10 @@ class FileManager {
       for (let path of obj.tempFilePaths) {
         try {
           let newKey = obj.setKey(path);
+          if (this._storageAdd.has(newKey) || this._storageInfo.map.has(newKey)) {
+            console.log("缓存key值重复", newKey);
+            return;
+          }
           let res = await saveFilePromise({
             tempFilePath: path
           });
@@ -112,6 +117,10 @@ class FileManager {
       for (let entry of this._downloadMap) {
         try {
           let newKey = obj.setKey(entry[0]);
+          if (this._storageAdd.has(newKey) || this._storageInfo.map.has(newKey)) {
+            console.log("缓存key值重复", newKey);
+            return;
+          }
           let res = await saveFilePromise({
             tempFilePath: entry[1]
           });
@@ -126,6 +135,7 @@ class FileManager {
       }
     }
     this._downloadMap.clear();
+    this.getSavedFileInfo({});
     callBack.completeAll();
   }
 
@@ -189,21 +199,37 @@ class FileManager {
       for (let entry of this._storageAdd) {
         removeMap.set(entry[0], entry[1]);
       }
-      for (let entry of removeMap) {
-        try {
-          await removeFilePromise({
-            filePath: entry[1]
-          });
-          this._storageRemove.set(entry[0], entry[1]);
-          callBack.success();
-        } catch (err) {
-          console.log(err);
-          callBack.fail(err);
-        } finally {
-          callBack.complete();
+      if (removeMap.size != 0) {
+        for (let entry of removeMap) {
+          try {
+            await removeFilePromise({
+              filePath: entry[1]
+            });
+            this._storageRemove.set(entry[0], entry[1]);
+            callBack.success();
+          } catch (err) {
+            console.log(err);
+            callBack.fail(err);
+          } finally {
+            callBack.complete();
+          }
+        }
+        this._storageAdd.clear();
+      } else {
+        for (let path of this._filesInfo.paths) {
+          try {
+            await removeFilePromise({
+              filePath: path
+            });
+            callBack.success();
+          } catch (err) {
+            console.log(err);
+            callBack.fail(err);
+          } finally {
+            callBack.complete();
+          }
         }
       }
-      this._storageAdd.clear();
     }
     this.getSavedFileInfo({});
     callBack.completeAll();
