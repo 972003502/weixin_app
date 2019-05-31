@@ -9,6 +9,9 @@ Page({
     this.fileManager = new FileManager();
     this.product = new DataBaseObject(table_Projuct);
     this.onQuery();
+    this.setData({
+      product_icon: wx.getStorageSync('product_icon_1558859578110.png')
+    })
   },
   data: {
     product_icons: [],
@@ -22,13 +25,14 @@ Page({
     wx.showLoading({
       title: '下载中'
     })
-    let imageList = [];
+    let fileIDlist = [];
     this.product.queryInDb({
       success: res => {
         for (let obj of res.data) {
-          imageList.push(obj.icon);
+          icons.push(obj.icon);
+          //let fileID = obj.icon.slice(obj.icon.indexOf('product_icon'));
+          //fileIDlist.push(fileID);
         }
-        icons = imageList
       },
       fail: (e) => {
         wx.showToast({
@@ -37,14 +41,28 @@ Page({
         })
       },
       complete: () => {
-        this.downloadImage();
+        let downloadfileList = [];
+        for (let icon of icons) {
+          let fileID = icon.slice(icon.indexOf('product_icon'));
+          if (this.fileManager.storageInfo.keys.indexOf(fileID) == -1) {
+            downloadfileList.push(icon);
+          }
+        }
+        console.log(downloadfileList);
+        if (downloadfileList.length == 0) {
+          wx.hideLoading();
+        }
+        else {
+          this.downloadImage(downloadfileList);
+          downloadfileList = [];
+        }
       }
     })
   },
 
-  downloadImage: function () {
+  downloadImage: function (fileList) {
     this.fileManager.downloadSync({
-      tempFilePaths: icons,
+      tempFilePaths: fileList,
       completeAll: () => {
         this.cacheImage();
       }
@@ -81,9 +99,6 @@ Page({
       }
     });
     console.log(wx.getStorageInfoSync());
-    // this.setData({
-    //   product_icon: wx.getStorageSync('product_icon_1558513044004.jpg')
-    // })
   },
 
   clear: function () {
