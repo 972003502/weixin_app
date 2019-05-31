@@ -50,9 +50,7 @@ Page({
   onQuery: function() {
     const db = wx.cloud.database()
     // 查询当前用户所有的 counters
-    db.collection('counters').where({
-      _openid: this.data.openid
-    }).get({
+    db.collection('counters').get({
       success: res => {
         this.setData({
           queryResult: JSON.stringify(res.data, null, 2)

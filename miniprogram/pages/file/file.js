@@ -8,7 +8,7 @@ Page({
   onLoad() {
     this.fileManager = new FileManager();
     this.product = new DataBaseObject(table_Projuct);
-    this.onQuery();
+    // this.onQuery();
     this.setData({
       product_icon: wx.getStorageSync('product_icon_1558859578110.png')
     })
@@ -25,13 +25,13 @@ Page({
     wx.showLoading({
       title: '下载中'
     })
+    let tempUrl = [];
     let fileIDlist = [];
     this.product.queryInDb({
       success: res => {
         for (let obj of res.data) {
-          icons.push(obj.icon);
-          //let fileID = obj.icon.slice(obj.icon.indexOf('product_icon'));
-          //fileIDlist.push(fileID);
+          tempUrl.push(obj.icon);
+          icons = tempUrl;
         }
       },
       fail: (e) => {
@@ -54,7 +54,6 @@ Page({
         }
         else {
           this.downloadImage(downloadfileList);
-          downloadfileList = [];
         }
       }
     })

@@ -58,42 +58,67 @@ class DataBaseObject {
   }
 
   queryInDb(obj) {
-    // 过滤无效字段
-    let newWhere = {};
-    for (let where in obj.where) {
-      if (where in this._fieids) {
-        newWhere[where] = obj.where[where];
-      }
+    let callBack = {
+      success: obj.success || function () { },
+      fail: obj.fail || function () { },
+      complete: obj.complete || function () { }
     }
-    newWhere._openid = getApp().globalData.openid;
-    this._db.collection(this._tableName).where(newWhere).get({
-      success: (res) => {
-        this._dataCollection = res.data;
-        obj.success(res);
-      },
-      fail: (e) => {
-        console.log(e);
-        obj.fail(e);
-      },
-      complete: () => {
-        obj.complete();
+    if (obj.where || false) {
+      // 过滤无效字段
+      let newWhere = {};
+      for (let where in obj.where) {
+        if (where in this._fieids) {
+          newWhere[where] = obj.where[where];
+        }
       }
-    })
+      this._db.collection(this._tableName).where(newWhere).get({
+        success: (res) => {
+          this._dataCollection = res.data;
+          callBack.success(res);
+        },
+        fail: (e) => {
+          console.log(e);
+          callBack.fail(e);
+        },
+        complete: () => {
+          callBack.complete();
+        }
+      })
+    } else {
+      this._db.collection(this._tableName).get({
+        success: (res) => {
+          this._dataCollection = res.data;
+          callBack.success(res);
+        },
+        fail: (e) => {
+          console.log(e);
+          callBack.fail(e);
+        },
+        complete: () => {
+          callBack.complete();
+        }
+      })
+    }
   }
 
-  addInDB(callBackObj) {
+  addInDB(obj) {
+    let callBack = {
+      success: obj.success || function () { },
+      fail: obj.fail || function () { },
+      complete: obj.complete || function () { }
+    }
     this._db.collection(this._tableName)
       .add({
         data: this._fieids,
         success: (res) => {
-          callBackObj.success(res);
+          callBack.success(res);
         },
         fail: (e) => {
           console.log(e);
-          callBackObj.fail(e);
+          callBack.fail(e);
         },
         complete: () => {
-          callBackObj.complete();
+          callBack.complete();
         }
       })
   }

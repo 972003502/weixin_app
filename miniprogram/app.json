@@ -1,11 +1,11 @@
 {
   "pages": [
+    "pages/aboutme/aboutme",
     "pages/menu/menu",
     "pages/file/file",
     "pages/cropper/cropper",
     "pages/productManager/productManager",
     "pages/addProduct/addProduct",
-    "pages/aboutme/aboutme",
     "pages/index/index",
     "pages/userConsole/userConsole",
     "pages/storageConsole/storageConsole",
