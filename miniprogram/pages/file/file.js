@@ -3,7 +3,7 @@ import DataBaseObject from '../../database/DataBaseObject.js';
 import FileManager from '../../module/fileManager/fileManager.js';
 
 let icons = [];
-let tempFilePaths = [];
+let start;
 Page({
   onLoad() {
     this.fileManager = new FileManager();
@@ -18,6 +18,10 @@ Page({
   },
 
   onQuery: function () {
+    start = Date.now();
+    wx.showLoading({
+      title: '下载中'
+    })
     let imageList = [];
     this.product.queryInDb({
       success: res => {
@@ -25,7 +29,6 @@ Page({
           imageList.push(obj.icon);
         }
         icons = imageList
-        //console.log("云链接", icons);
       },
       fail: (e) => {
         wx.showToast({
@@ -34,25 +37,16 @@ Page({
         })
       },
       complete: () => {
-        //this.downloadImage();
+        this.downloadImage();
       }
     })
   },
 
   downloadImage: function () {
-    let start = Date.now();
-    wx.showLoading({
-      title: '下载中'
-    })
     this.fileManager.downloadSync({
       tempFilePaths: icons,
       completeAll: () => {
-        let end = Date.now();
-        console.log("耗时", `${end - start}ms`);
-        wx.hideLoading();
-        wx.showToast({
-          title: '下载成功',
-        })
+        this.cacheImage();
       }
     });
   },
@@ -69,6 +63,12 @@ Page({
       },
       completeAll: () => {
         this.fileManager.syncToGlobalStorage();
+        let end = Date.now();
+        console.log("耗时", `${end - start}ms`);
+        wx.hideLoading();
+        wx.showToast({
+          title: '下载成功',
+        })
       }
     })
   },
@@ -94,39 +94,4 @@ Page({
       }
     });
   }
-
-  // downloadImage: function () {
-  //   let start = Date.now();
-  //   wx.showLoading({
-  //     title: '下载中'
-  //   })
-  //   let savedFilePaths = [];  //存放文件数组
-  //   for (let icon of icons) {
-  //     console.log("for循环",icons.indexOf(icon));
-  //     wx.cloud.downloadFile({
-  //       fileID: icon,
-  //       success(res) {
-  //         fileManager.saveFile({
-  //           tempFilePath: res.tempFilePath,
-  //           success(res) {
-  //             let fileID = icon.slice(icon.indexOf('product_icon'));
-  //             savedFilePaths.push(res.savedFilePath);
-  //             wx.setStorageSync(`${fileID}`, res.savedFilePath);
-  //             console.log("success回调",icons.indexOf(icon));
-  //           },
-  //           complete: () => {
-  //             if (savedFilePaths.length == icons.length) {
-  //               let end = Date.now();
-  //               wx.hideLoading();
-  //               wx.showToast({
-  //                 title: '下载成功',
-  //               })
-  //               console.log("耗时", `${end - start}ms`);
-  //             }
-  //           }
-  //         })
-  //       }
-  //     })
-  //   }
-  // },
 })
