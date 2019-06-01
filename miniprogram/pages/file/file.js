@@ -10,7 +10,7 @@ Page({
     this.product = new DataBaseObject(table_Projuct);
     // this.onQuery();
     this.setData({
-      product_icon: wx.getStorageSync('product_icon_1558859578110.png')
+      product_icon: wx.getStorageSync('product_icon_1558859040090.png')
     })
   },
   data: {

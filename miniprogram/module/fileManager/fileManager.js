@@ -61,6 +61,34 @@ class FileManager {
     }
   }
 
+  download(obj) {
+    let callBack = {
+      success: obj.success || function () { },
+      fail: obj.fail || function () { },
+      complete: obj.complete || function () { },
+      completeAll: obj.completeAll || function () { }
+    }
+    for (let path of obj.tempFilePaths) {
+      wx.cloud.downloadFile({
+        fileID: path,
+        success: res => {
+          this._downloadMap.set(path, res.tempFilePath);
+          callBack.success(res);
+        },
+        fail: err => {
+          console.log(err);
+          callBack.fail(err);
+        },
+        complete: () => {
+          callBack.complete();
+          if (obj.tempFilePaths.length == this._downloadMap.size) {
+            callBack.completeAll();
+          }
+        }
+      })
+    }
+  }
+
   async downloadSync(obj) {
     let callBack = {
       success: obj.success || function () { },

@@ -1,8 +1,8 @@
 //app.js
+import extend from './module/mp-extend/extend-config.js';
 import table_Projuct from './database/table/product.js';
 import DataBaseObject from './database/DataBaseObject.js';
 import FileManager from './module/fileManager/fileManager.js';
-import extend from './module/mp-extend/extend-config.js';
 
 App = extend.App
 Page = extend.Page
@@ -48,7 +48,7 @@ App({
   },
 
   downloadImage: function (fileList) {
-    this.fileManager.downloadSync({
+    this.fileManager.download({
       tempFilePaths: fileList,
       completeAll: () => {
         this.cacheImage();
@@ -59,8 +59,7 @@ App({
   cacheImage: function () {
     this.fileManager.saveFileSync({
       setKey: (value) => {
-        let fileID = value.slice(value.indexOf('product_icon'));
-        return fileID;
+        return value.slice(value.indexOf('product_icon'));;
       },
       completeAll: () => {
         this.fileManager.syncToGlobalStorage();
