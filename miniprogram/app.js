@@ -67,9 +67,5 @@ App({
         console.log("耗时", `${end - this.start}ms`);
       }
     })
-  },
-
-  onShow() {
-
-  },
+  }
 })
