@@ -131,7 +131,10 @@ class FileManager {
           let res = await saveFilePromise({
             tempFilePath: path
           });
-          this._storageAdd.set(newKey, res.savedFilePath);
+          if (obj.setValue || false) {
+            let newValue = obj.setValue(res.savedFilePath);
+            this._storageAdd.set(newKey, newValue);
+          } else this._storageAdd.set(newKey, res.savedFilePath);
           callBack.success(res);
         } catch (err) {
           console.log(err);
@@ -150,7 +153,10 @@ class FileManager {
           let res = await saveFilePromise({
             tempFilePath: entry[1]
           });
-          this._storageAdd.set(newKey, res.savedFilePath);
+          if (obj.setValue || false) {
+            let newValue = obj.setValue(res.savedFilePath);
+            this._storageAdd.set(newKey, newValue);
+          } else this._storageAdd.set(newKey, res.savedFilePath);
           callBack.success(res);
         } catch (err) {
           console.log(err);
@@ -206,12 +212,15 @@ class FileManager {
     if (obj.fileKeys || false) {
       for (let fileKey of obj.fileKeys) {
         try {
-          let path = this._storageAdd.get(fileKey) || this._storageInfo.map.get(fileKey);
+          let res = this._storageAdd.get(fileKey) || this._storageInfo.map.get(fileKey);
+          if (obj.getValue || false) {
+            res = obj.getValue(res);
+          }
           await removeFilePromise({
-            filePath: path
+            filePath: res
           });
           this._storageAdd.delete(fileKey);
-          this._storageRemove.set(fileKey, path);
+          this._storageRemove.set(fileKey, '');
           callBack.success();
         } catch (err) {
           console.log(err);
@@ -227,8 +236,12 @@ class FileManager {
             filePath: path
           });
           for (let entry of this._storageInfo.map) {
-            if (entry[1] == path) {
-              this._storageRemove.set(entry[0], entry[1]);
+            let res;
+            if (obj.getValue || false) {
+              res = obj.getValue(entry[1]);
+            } else res = entry[1];
+            if (res == path) {
+              this._storageRemove.set(entry[0], '');
             }
           }
           callBack.success();

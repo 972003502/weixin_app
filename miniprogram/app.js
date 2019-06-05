@@ -26,10 +26,12 @@ App({
   onInit: function () {
     this.start = Date.now();
     let fileList = [];
+    let newMap = new Map();
     this.product.queryInDb({
       success: res => {
         for (let obj of res.data) {
           fileList.push(obj.icon);
+          newMap.set(obj._id, obj);
         }
       },
       complete: () => {
@@ -60,6 +62,9 @@ App({
     this.fileManager.saveFileSync({
       setKey: (value) => {
         return value.slice(value.indexOf('product_icon'));;
+      },
+      setValue: (value) => {
+        return value;
       },
       completeAll: () => {
         this.fileManager.syncToGlobalStorage();
