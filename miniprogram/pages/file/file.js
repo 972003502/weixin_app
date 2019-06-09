@@ -102,11 +102,9 @@ Page({
 
   clear: function () {
     this.fileManager.clearFile({
-      // getValue: (value) => {
-      //   return value;
-      // },
       completeAll: () => {
         this.fileManager.syncToGlobalStorage();
+        wx.clearStorageSync();
         console.log("clear all success");
       }
     });

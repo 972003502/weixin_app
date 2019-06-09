@@ -22,18 +22,37 @@ Page({
   onPreload: function () {
     this.fileManager = new FileManager();
     this.product = new DataBaseObject(table_Projuct);
-    this.onQuery();
+    //this.onQuery();
+    this.onInit();
     console.log("已预加载");
+  },
+
+  onInit: function () {
+    let productStorage = this.fileManager.storageInfo.values;
+    this.setData({
+      products: this.groupBy(productStorage, 'classify')
+    })
+  },
+
+  groupBy: function (data, fieidName) {
+    let fieidValues = [];
+    let result = [];
+    for (let obj of data) {
+      if (!fieidValues.includes(obj[fieidName])) {
+        fieidValues.push(obj[fieidName]);
+        result.push(data.filter(item => item[fieidName] == obj[fieidName]));
+      }
+    }
+    return result;
   },
 
   onQuery: function () {
     this.product.queryInDb({
       success: res => {
         for (let data of this.product.dataCollection) {
-          let iconID = data.icon.slice(data.icon.indexOf('product_icon'));
           // 内存包含
-          if (this.fileManager.storageInfo.keys.indexOf(iconID) != -1) {
-            data.icon = this.fileManager.storageInfo.map.get(iconID);
+          if (this.fileManager.storageInfo.keys.indexOf(data._id) != -1) {
+            data.icon = this.fileManager.storageInfo.map.get(data._id).icon;
           }
         }
         this.setData({
@@ -52,11 +71,11 @@ Page({
     })
   },
 
-  onImageLoad: function() {
+  onImageLoad: function () {
     console.log("图片已加载");
   },
 
-  onShow: function() {
+  onShow: function () {
   },
 
   onAddProduct() {

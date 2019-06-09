@@ -213,9 +213,9 @@ class FileManager {
       for (let fileKey of obj.fileKeys) {
         try {
           let res = this._storageAdd.get(fileKey) || this._storageInfo.map.get(fileKey);
-          if (obj.getValue || false) {
-            res = obj.getValue(res);
-          }
+          // if (obj.getValue || false) {
+          //   res = obj.getValue(res);
+          // }
           await removeFilePromise({
             filePath: res
           });
@@ -236,11 +236,12 @@ class FileManager {
             filePath: path
           });
           for (let entry of this._storageInfo.map) {
-            let res;
-            if (obj.getValue || false) {
-              res = obj.getValue(entry[1]);
-            } else res = entry[1];
-            if (res == path) {
+            // let res;
+            // if (obj.getValue || false) {
+            //   res = obj.getValue(entry[1]);
+            // } else res = entry[1];
+
+            if (entry[1] == path) {
               this._storageRemove.set(entry[0], '');
             }
           }

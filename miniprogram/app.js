@@ -23,24 +23,34 @@ App({
     this.onInit();
   },
 
+  slieStr: function (str1, str2) {
+    return str1.slice(str1.indexOf(str2));
+  },
+
   onInit: function () {
+    wx.showLoading({
+      title: '加载中'
+    })
     this.start = Date.now();
-    let fileList = [];
-    let newMap = new Map();
+    this.newMap = new Map();
     this.product.queryInDb({
       success: res => {
         for (let obj of res.data) {
-          fileList.push(obj.icon);
-          newMap.set(obj._id, obj);
+          this.newMap.set(obj._id, obj);
         }
       },
       complete: () => {
         let downloadfileList = [];
-        for (let file of fileList) {
-          let fileID = file.slice(file.indexOf('product_icon'));
-          if (this.fileManager.storageInfo.keys.indexOf(fileID) == -1) {
-            downloadfileList.push(file);
-          } else console.log("重复值");
+        for (let entry of this.newMap) {
+          if (this.fileManager.storageInfo.keys.indexOf(entry[0]) == -1) {
+            downloadfileList.push(entry[1].icon);
+          } else {
+            wx.hideLoading();
+            wx.showToast({
+              title: '加载完成',
+            })
+            console.log("重复值");
+          }
         }
         if (downloadfileList.length != 0) {
           this.downloadImage(downloadfileList);
@@ -59,16 +69,30 @@ App({
   },
 
   cacheImage: function () {
+    let newObj;
     this.fileManager.saveFileSync({
       setKey: (value) => {
-        return value.slice(value.indexOf('product_icon'));;
+        for (let entry of this.newMap) {
+          if (entry[1].icon == value) {
+            newObj = entry[1];
+            return entry[0];
+          }
+        }
       },
       setValue: (value) => {
-        return value;
+        newObj.icon = value;
+        return newObj;
       },
       completeAll: () => {
         this.fileManager.syncToGlobalStorage();
+        for (let map of this.fileManager.storageInfo.map) {
+          console.log(map);
+        }
         let end = Date.now();
+        wx.hideLoading();
+        wx.showToast({
+          title: '加载完成',
+        })
         console.log("耗时", `${end - this.start}ms`);
       }
     })
