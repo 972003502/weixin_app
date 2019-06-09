@@ -45,7 +45,6 @@ export default {
           this.setData(item);
         })
         delete preloadData[this.path];
-        console.log("ok")
       }
       // 没有预加载的话直接正常执行加载
       else{

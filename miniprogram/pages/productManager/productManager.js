@@ -22,7 +22,6 @@ Page({
   onPreload: function () {
     this.fileManager = new FileManager();
     this.product = new DataBaseObject(table_Projuct);
-    //this.onQuery();
     this.onInit();
     console.log("已预加载");
   },
@@ -72,7 +71,7 @@ Page({
   },
 
   onImageLoad: function () {
-    console.log("图片已加载");
+
   },
 
   onShow: function () {
