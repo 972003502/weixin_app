@@ -45,6 +45,25 @@ Page({
     return result;
   },
 
+  actionSheetTap: function(e) {
+    let productID = e.currentTarget.dataset.id;
+    wx.showActionSheet({
+      itemList: ['修改', '删除'],
+      itemColor: '#FF3030',
+      success(e) {
+        if (e.tapIndex == 1) {
+          console.log(productID);
+        }
+      }
+    })
+  },
+
+  onAddProduct: function() {
+    wx.navigateTo({
+      url: '../addProduct/addProduct'
+    })
+  },
+
   onQuery: function () {
     this.product.queryInDb({
       success: res => {
@@ -71,15 +90,8 @@ Page({
   },
 
   onImageLoad: function () {
-
   },
 
   onShow: function () {
-  },
-
-  onAddProduct() {
-    wx.navigateTo({
-      url: '../addProduct/addProduct'
-    })
   }
 })
