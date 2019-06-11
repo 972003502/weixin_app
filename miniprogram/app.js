@@ -40,11 +40,13 @@ App({
         }
       },
       complete: () => {
-        let downloadfileList = [];
+        let newList = [];
+        let containList = [];
         for (let entry of this.newMap) {
-          if (this.fileManager.storageInfo.keys.indexOf(entry[0]) == -1) {
-            downloadfileList.push(entry[1].icon);
+          if (!this.fileManager.storageInfo.keys.includes(entry[0])) {
+            newList.push(entry[1].icon);
           } else {
+            containList.push(entry[0]);//删除
             wx.hideLoading();
             wx.showToast({
               title: '加载完成',
@@ -52,8 +54,19 @@ App({
             console.log("重复值");
           }
         }
-        if (downloadfileList.length != 0) {
-          this.downloadImage(downloadfileList);
+        for (let key of this.fileManager.storageInfo.keys) {
+          if (!containList.includes(key)) {
+            wx.removeSavedFile({
+              filePath: this.fileManager.storageInfo.map.get(key).icon,
+              success: (res) => {
+                wx.removeStorageSync(key);
+              }
+            }) 
+          }
+        } 
+        this.fileManager.getStorageInfoSync();
+        if (newList.length != 0) {
+          this.downloadImage(newList);
         }
       }
     })
