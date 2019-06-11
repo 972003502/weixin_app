@@ -123,8 +123,25 @@ class DataBaseObject {
       })
   }
 
-  delInDB() {
-
+  delInDB(obj) {
+    let callBack = {
+      success: obj.success || function () { },
+      fail: obj.fail || function () { },
+      complete: obj.complete || function () { },
+      completeAll: obj.completeAll || function () { }
+    }
+    for (let data of obj.data) {
+      try {
+        let res = this._db.collection(this._tableName).doc(data).remove();
+        callBack.success(res);
+      } catch (err) {
+        console.log(err);
+        callBack.fail(err);
+      } finally {
+        callBack.complete();
+      }
+    }
+    callBack.completeAll();
   }
 
   updInDb() {

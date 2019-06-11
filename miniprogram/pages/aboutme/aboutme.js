@@ -13,7 +13,7 @@ Page({
     icon5: '../../images/position.png',
     icon6: '../../images/setting.png',
     avatarUrl: './user-unlogin.png',
-    preLoadUrl: 'pages/productManagement/productManagement?num=1',
+    // preLoadUrl: 'pages/productManagement/productManagement?num=1',
     userInfo: {},
     hasUserInfo: false
   },
@@ -46,7 +46,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    this.$preload(this.data.preLoadUrl);
+    // this.$preload(this.data.preLoadUrl);
   },
 
   /**

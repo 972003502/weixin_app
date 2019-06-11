@@ -6,7 +6,7 @@ Page({
   /**
    * 页面的初始数据
    */
-  path: "pages/productManagement/productManagement",
+  //path: "pages/productManagement/productManagement",
   data: {
     products: []
   },
@@ -14,17 +14,19 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  // onLoad: function (options) {
-  //   this.product = new DataBaseObject(table_Projuct);
-  //   this.onQuery();
-  // },
-
-  onPreload: function () {
+  onLoad: function (options) {
     this.fileManager = new FileManager();
     this.product = new DataBaseObject(table_Projuct);
     this.onInit();
-    console.log("已预加载");
   },
+
+  // 预加载
+  // onPreload: function () {
+  //   this.fileManager = new FileManager();
+  //   this.product = new DataBaseObject(table_Projuct);
+  //   this.onInit();
+  //   console.log("已预加载");
+  // },
 
   onInit: function () {
     let productStorage = this.fileManager.storageInfo.values;
@@ -45,53 +47,66 @@ Page({
     return result;
   },
 
-  actionSheetTap: function(e) {
+  actionSheetTap: function (e) {
+    const that = this;
+    console.log(this.fileManager);
     let productID = e.currentTarget.dataset.id;
     wx.showActionSheet({
       itemList: ['修改', '删除'],
       itemColor: '#FF3030',
       success(e) {
         if (e.tapIndex == 1) {
-          console.log(productID);
+          let productInfo = that.fileManager.storageInfo.map.get(productID);
+          that.product.delInDB({
+            data: [productID],
+            completeAll: () => {
+              console.log("删除成功");
+            }
+          })
+          wx.cloud.deleteFile({
+            fileList: [productInfo.orgIcon]
+          }).then(res => {
+            console.log("云存储删除成功", res.fileList);
+          })
         }
       }
     })
   },
 
-  onAddProduct: function() {
+  onAddProduct: function () {
     wx.navigateTo({
       url: '../addProduct/addProduct'
     })
-  },
-
-  onQuery: function () {
-    this.product.queryInDb({
-      success: res => {
-        for (let data of this.product.dataCollection) {
-          // 内存包含
-          if (this.fileManager.storageInfo.keys.indexOf(data._id) != -1) {
-            data.icon = this.fileManager.storageInfo.map.get(data._id).icon;
-          }
-        }
-        this.setData({
-          products: this.product.innerQueryBy('classify')
-        })
-      },
-      fail: (e) => {
-        wx.showToast({
-          icon: 'none',
-          title: '加载失败'
-        })
-      },
-      complete: () => {
-        console.log("图片地址", that.product.dataCollection[0]);
-      }
-    })
-  },
-
-  onImageLoad: function () {
-  },
-
-  onShow: function () {
   }
+
+  // onQuery: function () {
+  //   this.product.queryInDb({
+  //     success: res => {
+  //       for (let data of this.product.dataCollection) {
+  //         // 内存包含
+  //         if (this.fileManager.storageInfo.keys.indexOf(data._id) != -1) {
+  //           data.icon = this.fileManager.storageInfo.map.get(data._id).icon;
+  //         }
+  //       }
+  //       this.setData({
+  //         products: this.product.innerQueryBy('classify')
+  //       })
+  //     },
+  //     fail: (e) => {
+  //       wx.showToast({
+  //         icon: 'none',
+  //         title: '加载失败'
+  //       })
+  //     },
+  //     complete: () => {
+  //       console.log("图片地址", that.product.dataCollection[0]);
+  //     }
+  //   })
+  // },
+
+  // onImageLoad: function () {
+  // },
+
+  // onShow: function () {
+  // }
 })

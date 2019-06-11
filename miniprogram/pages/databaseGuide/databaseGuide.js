@@ -109,6 +109,7 @@ Page({
     if (this.data.counterId) {
       const db = wx.cloud.database()
       db.collection('counters').doc(this.data.counterId).remove({
+      //db.collection('counters').where({count: 1}).remove({
         success: res => {
           wx.showToast({
             title: '删除成功',

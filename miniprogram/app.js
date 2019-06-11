@@ -75,6 +75,7 @@ App({
         for (let entry of this.newMap) {
           if (entry[1].icon == value) {
             newObj = entry[1];
+            newObj.orgIcon = value;
             return entry[0];
           }
         }
