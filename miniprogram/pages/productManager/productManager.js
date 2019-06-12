@@ -29,10 +29,9 @@ Page({
   // },
 
   onInit: function () {
-    this.productStorage = this.fileManager.storageInfo.values;
-    let groupedRes = this.groupBy(this.productStorage, 'classify');
+    let productStorage = this.fileManager.storageInfo.values;
     this.setData({
-      products: groupedRes
+        products: this.groupBy(productStorage, 'classify')
     })
   },
 
@@ -50,7 +49,6 @@ Page({
 
   actionSheetTap: function (e) {
     const that = this;
-    console.log(this.fileManager);
     let productID = e.currentTarget.dataset.id;
     wx.showActionSheet({
       itemList: ['修改', '删除'],
@@ -61,18 +59,17 @@ Page({
           that.product.delInDB({
             data: [productID],
             completeAll: () => {
-              // let filterRes = that.productStorage.filter(item => item._id != productID);
-              // that.setData({
-              //   products: that.groupBy(filterRes, 'classify')
-              // })
               wx.removeSavedFile({
                 filePath: that.fileManager.storageInfo.map.get(productID).icon,
                 success: (res) => {
                   wx.removeStorageSync(productID);
+                  that.fileManager.getStorageInfoSync();
+                  that.onInit();
+                  wx.showToast({
+                    title: '操作成功',
+                  })
                 }
-              })
-              that.fileManager.getStorageInfoSync();
-              that.onInit();
+              })   
             }
           })
           wx.cloud.deleteFile({
