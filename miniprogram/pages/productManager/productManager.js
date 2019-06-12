@@ -29,9 +29,10 @@ Page({
   // },
 
   onInit: function () {
-    let productStorage = this.fileManager.storageInfo.values;
+    this.productStorage = this.fileManager.storageInfo.values;
+    let groupedRes = this.groupBy(this.productStorage, 'classify');
     this.setData({
-      products: this.groupBy(productStorage, 'classify')
+      products: groupedRes
     })
   },
 
@@ -43,7 +44,7 @@ Page({
         fieidValues.push(obj[fieidName]);
         result.push(data.filter(item => item[fieidName] == obj[fieidName]));
       }
-    }
+    }  
     return result;
   },
 
@@ -60,7 +61,18 @@ Page({
           that.product.delInDB({
             data: [productID],
             completeAll: () => {
-              console.log("删除成功");
+              // let filterRes = that.productStorage.filter(item => item._id != productID);
+              // that.setData({
+              //   products: that.groupBy(filterRes, 'classify')
+              // })
+              wx.removeSavedFile({
+                filePath: that.fileManager.storageInfo.map.get(productID).icon,
+                success: (res) => {
+                  wx.removeStorageSync(productID);
+                }
+              })
+              that.fileManager.getStorageInfoSync();
+              that.onInit();
             }
           })
           wx.cloud.deleteFile({
