@@ -17,7 +17,6 @@ Page({
   onLoad: function (options) {
     this.fileManager = new FileManager();
     this.product = new DataBaseObject(table_Projuct);
-    this.onInit();
   },
 
   // 预加载
@@ -31,7 +30,7 @@ Page({
   onInit: function () {
     let productStorage = this.fileManager.storageInfo.values;
     this.setData({
-        products: this.groupBy(productStorage, 'classify')
+      products: this.groupBy(productStorage, 'classify')
     })
   },
 
@@ -43,7 +42,7 @@ Page({
         fieidValues.push(obj[fieidName]);
         result.push(data.filter(item => item[fieidName] == obj[fieidName]));
       }
-    }  
+    }
     return result;
   },
 
@@ -69,7 +68,7 @@ Page({
                     title: '操作成功',
                   })
                 }
-              })   
+              })
             }
           })
           wx.cloud.deleteFile({
@@ -86,6 +85,20 @@ Page({
     wx.navigateTo({
       url: '../addProduct/addProduct'
     })
+  },
+
+  /**
+ * 页面相关事件处理函数--监听用户下拉动作
+ */
+  onPullDownRefresh: function () {
+    wx.showToast({
+      title: 'loading...',
+      icon: 'loading'
+    })
+  },
+
+  onShow: function () {
+    this.onInit();
   }
 
   // onQuery: function () {
@@ -115,7 +128,4 @@ Page({
 
   // onImageLoad: function () {
   // },
-
-  // onShow: function () {
-  // }
 })
