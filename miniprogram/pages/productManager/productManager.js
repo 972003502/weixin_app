@@ -64,6 +64,10 @@ Page({
               }
             }
           })
+        } else if (e.tapIndex == 0) {
+          wx.navigateTo({
+            url: '../addProduct/addProduct'
+          })
         }
       }
     })
@@ -133,9 +137,8 @@ Page({
           this.downloadImage(newList);
         } else {
           wx.stopPullDownRefresh({
-            complete(res) {
+            complete() {
               wx.hideLoading();
-              console.log(res, new Date())
             }
           })
         }
@@ -181,31 +184,6 @@ Page({
       }
     })
   }
-
-  // onQuery: function () {
-  //   this.product.queryInDb({
-  //     success: res => {
-  //       for (let data of this.product.dataCollection) {
-  //         // 内存包含
-  //         if (this.fileManager.storageInfo.keys.indexOf(data._id) != -1) {
-  //           data.icon = this.fileManager.storageInfo.map.get(data._id).icon;
-  //         }
-  //       }
-  //       this.setData({
-  //         products: this.product.innerQueryBy('classify')
-  //       })
-  //     },
-  //     fail: (e) => {
-  //       wx.showToast({
-  //         icon: 'none',
-  //         title: '加载失败'
-  //       })
-  //     },
-  //     complete: () => {
-  //       console.log("图片地址", that.product.dataCollection[0]);
-  //     }
-  //   })
-  // },
 
   // onImageLoad: function () {
   // },
