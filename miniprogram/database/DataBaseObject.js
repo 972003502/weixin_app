@@ -109,7 +109,7 @@ class DataBaseObject {
     }
     this._db.collection(this._tableName)
       .add({
-        data: this._fieids,
+        data: obj.data || this._fieids,
         success: (res) => {
           callBack.success(res);
         },

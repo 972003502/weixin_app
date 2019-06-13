@@ -54,30 +54,43 @@ Page({
       itemColor: '#FF3030',
       success(e) {
         if (e.tapIndex == 1) {
-          let productInfo = that.fileManager.storageInfo.map.get(productID);
-          that.product.delInDB({
-            data: [productID],
-            completeAll: () => {
-              wx.removeSavedFile({
-                filePath: that.fileManager.storageInfo.map.get(productID).icon,
-                success: (res) => {
-                  wx.removeStorageSync(productID);
-                  that.fileManager.getStorageInfoSync();
-                  that.onInit();
-                  wx.showToast({
-                    title: '操作成功',
-                  })
-                }
-              })
+          wx.showModal({
+            content: '是否删除产品',
+            confirmText: '确定',
+            cancelText: '取消',
+            success: (res) => {
+              if (res.confirm) {
+                that.onDelProduct(productID);
+              }
             }
-          })
-          wx.cloud.deleteFile({
-            fileList: [productInfo.orgIcon]
-          }).then(res => {
-            console.log("云存储删除成功", res.fileList);
           })
         }
       }
+    })
+  },
+
+  onDelProduct: function (productID) {
+    let productInfo = this.fileManager.storageInfo.map.get(productID);
+    this.product.delInDB({
+      data: [productID],
+      completeAll: () => {
+        wx.removeSavedFile({
+          filePath: this.fileManager.storageInfo.map.get(productID).icon,
+          success: (res) => {
+            wx.removeStorageSync(productID);
+            this.fileManager.getStorageInfoSync();
+            this.onInit();
+            wx.showToast({
+              title: '操作成功',
+            })
+          }
+        })
+      }
+    })
+    wx.cloud.deleteFile({
+      fileList: [productInfo.orgIcon]
+    }).then(res => {
+      console.log("云存储删除成功", res.fileList);
     })
   },
 
@@ -87,18 +100,86 @@ Page({
     })
   },
 
-  /**
- * 页面相关事件处理函数--监听用户下拉动作
- */
   onPullDownRefresh: function () {
-    wx.showToast({
-      title: 'loading...',
-      icon: 'loading'
+    wx.showLoading({
+      title: '加载中'
     })
+    this.onRefresh();
   },
 
   onShow: function () {
     this.onInit();
+  },
+
+  onRefresh: function () {
+    this.start = Date.now();
+    this.newMap = new Map();
+    this.product.queryInDb({
+      success: res => {
+        for (let obj of res.data) {
+          this.newMap.set(obj._id, obj);
+        }
+      },
+      complete: () => {
+        let newList = [];
+        for (let entry of this.newMap) {
+          if (!this.fileManager.storageInfo.keys.includes(entry[0])) {
+            newList.push(entry[1].icon);
+          } else {
+            console.log("重复值");
+          }
+        }
+        if (newList.length != 0) {
+          this.downloadImage(newList);
+        } else {
+          wx.stopPullDownRefresh({
+            complete(res) {
+              wx.hideLoading();
+              console.log(res, new Date())
+            }
+          })
+        }
+      }
+    })
+  },
+
+  downloadImage: function (fileList) {
+    this.fileManager.download({
+      tempFilePaths: fileList,
+      completeAll: () => {
+        this.cacheImage();
+      }
+    });
+  },
+
+  cacheImage: function () {
+    let newObj;
+    this.fileManager.saveFileSync({
+      setKey: (value) => {
+        for (let entry of this.newMap) {
+          if (entry[1].icon == value) {
+            newObj = entry[1];
+            newObj.orgIcon = value;
+            return entry[0];
+          }
+        }
+      },
+      setValue: (value) => {
+        newObj.icon = value;
+        return newObj;
+      },
+      completeAll: () => {
+        this.fileManager.syncToGlobalStorage();
+        this.onInit();
+        wx.stopPullDownRefresh({
+          complete() {
+            wx.hideLoading();
+          }
+        })
+        let end = Date.now();
+        console.log("耗时", `${end - this.start}ms`);
+      }
+    })
   }
 
   // onQuery: function () {

@@ -23,14 +23,7 @@ App({
     this.onInit();
   },
 
-  slieStr: function (str1, str2) {
-    return str1.slice(str1.indexOf(str2));
-  },
-
   onInit: function () {
-    wx.showLoading({
-      title: '加载中'
-    })
     this.start = Date.now();
     this.newMap = new Map();
     this.product.queryInDb({
@@ -47,10 +40,6 @@ App({
             newList.push(entry[1].icon);
           } else {
             containList.push(entry[0]);//删除
-            wx.hideLoading();
-            wx.showToast({
-              title: '加载完成',
-            })
             console.log("重复值");
           }
         }
@@ -73,6 +62,9 @@ App({
   },
 
   downloadImage: function (fileList) {
+    wx.showLoading({
+      title: '加载中'
+    })
     this.fileManager.download({
       tempFilePaths: fileList,
       completeAll: () => {
