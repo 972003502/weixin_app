@@ -19,7 +19,7 @@ Page({
     this.fileManager = new FileManager();
     this.oldProduct = this.fileManager.storageInfo.map.get(options.id);
     this.newProduct = new DataBaseObject(table_Projuct);
-    this.setData({              
+    this.setData({
       nameInput: this.oldProduct.name,
       describeInput: this.oldProduct.describe,
       priceInput: this.oldProduct.price,
@@ -125,8 +125,17 @@ Page({
   },
 
   onSubmit: function () {
-    console.log(this.updFlageList.includes(true));
-    //this.cloudUploadFile();
+    let updFlage = this.updFlageList.includes(true);
+    if (updFlage) {
+      // this.cloudUploadFile();
+    } else {
+      wx.showModal({
+        title: '提示',
+        content: '并未做出任何修改，无需保存',
+        showCancel: false,
+        confirmText: '确定'
+      })
+    }
   },
 
   cloudUploadFile: function () {
