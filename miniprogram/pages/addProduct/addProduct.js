@@ -15,7 +15,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function () {
-    this.product = new DataBaseObject(table_Projuct);
+    this.newProduct = new DataBaseObject(table_Projuct);
   },
 
   /**
@@ -23,36 +23,36 @@ Page({
  */
   onShow: function () {
     this.setData({
-      isComplete: this.product.isContainNull()
+      isComplete: this.newProduct.isContainNull()
     })
   },
 
   onPickerChange: function (e) {
-    this.product.setValue('classify', this.data.picker[e.detail.value]);
+    this.newProduct.setValue('classify', this.data.picker[e.detail.value]);
     this.setData({
       index: e.detail.value,
-      isComplete: this.product.isContainNull()
+      isComplete: this.newProduct.isContainNull()
     })
   },
 
   onNameInput: function (e) {
-    this.product.setValue('name', e.detail.value);
+    this.newProduct.setValue('name', e.detail.value);
     this.setData({
-      isComplete: this.product.isContainNull()
+      isComplete: this.newProduct.isContainNull()
     })
   },
 
   onDescribeInput: function (e) {
-    this.product.setValue('describe', e.detail.value);
+    this.newProduct.setValue('describe', e.detail.value);
     this.setData({
-      isComplete: this.product.isContainNull()
+      isComplete: this.newProduct.isContainNull()
     })
   },
 
   onPriceInput: function (e) {
-    this.product.setValue('price', e.detail.value);
+    this.newProduct.setValue('price', e.detail.value);
     this.setData({
-      isComplete: this.product.isContainNull()
+      isComplete: this.newProduct.isContainNull()
     })
   },
 
@@ -90,9 +90,9 @@ Page({
           this.setData({
             imgList: this.data.imgList
           })
-          this.product.setValue('icon', null);
+          this.newProduct.setValue('icon', null);
           this.setData({
-            isComplete: this.product.isContainNull()
+            isComplete: this.newProduct.isContainNull()
           })
         }
       }
@@ -107,13 +107,13 @@ Page({
     wx.showLoading({
       title: '提交中'
     })
-    const filePath = this.product.getValue('icon');
+    const filePath = this.newProduct.getValue('icon');
     const cloudPath = 'product_icon_' + Date.now() + filePath.match(/\.[^.]+?$/)[0];
     wx.cloud.uploadFile({
       cloudPath,
       filePath,
       success: res => {
-        this.product.setValue('icon', res.fileID);
+        this.newProduct.setValue('icon', res.fileID);
       },
       fail: e => {
         wx.showToast({
@@ -122,7 +122,7 @@ Page({
         })
       },
       complete: () => {
-        this.product.addInDB({
+        this.newProduct.addInDB({
           success: res => {
             wx.hideLoading();
             wx.showToast({
@@ -136,7 +136,7 @@ Page({
             })
           },
           complete: () => {
-            this.product.clearValue();
+            this.newProduct.clearValue();
             this.setData({
               nameInput: null,
               describeInput: null,
@@ -148,15 +148,6 @@ Page({
           }
         });
       }
-    })
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-    this.setData({
-      isComplete: this.product.isContainNull()
     })
   }
 })

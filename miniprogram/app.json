@@ -13,7 +13,8 @@
     "pages/addFunction/addFunction",
     "pages/deployFunctions/deployFunctions",
     "pages/chooseLib/chooseLib",
-    "pages/openapi/openapi"
+    "pages/openapi/openapi",
+    "pages/updProduct/updProduct"
   ],
   "tabBar": {
     "borderStyle": "white",

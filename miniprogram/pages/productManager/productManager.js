@@ -66,7 +66,7 @@ Page({
           })
         } else if (e.tapIndex == 0) {
           wx.navigateTo({
-            url: '../addProduct/addProduct'
+            url: '../updProduct/updProduct?id=' + productID
           })
         }
       }
