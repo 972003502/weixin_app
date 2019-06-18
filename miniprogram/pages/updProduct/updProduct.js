@@ -122,8 +122,7 @@ Page({
     let updFlage = this.updFlageList.includes(true);
     console.log(this.updFlageList);
     if (updFlage) {
-      console.log(this.oldProduct);
-      //this.cloudUploadFile();
+      this.cloudUploadFile();
     } else {
       wx.showModal({
         title: '提示',
@@ -152,13 +151,22 @@ Page({
             icon: 'none',
             title: '图片上传失败',
           })
+        },
+        complete: () => {
+          wx.hideLoading();
+          this.updProduct();
         }
       })
+    } else {
+      wx.hideLoading();
+      this.updProduct();
     }
+  },
+
+  updProduct: function () {
     this.newProduct.updInDb({
       dataID: this.oldProduct._id,
       success: res => {
-        wx.hideLoading();
         wx.showToast({
           title: '提交成功',
         })
