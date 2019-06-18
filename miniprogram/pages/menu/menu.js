@@ -1,5 +1,5 @@
 // miniprogram/pages/menu/menu.js
-import table_Projuct from '../../database/table/product.js';
+import table_Projuct from '../../database/table/Product.js';
 import DataBaseObject from '../../database/DataBaseObject.js';
 import FileManager from '../../module/fileManager/fileManager.js';
 

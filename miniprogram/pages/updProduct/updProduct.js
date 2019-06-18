@@ -1,20 +1,14 @@
-import table_Projuct from '../../database/table/product.js';
+import table_Projuct from '../../database/table/Product.js';
 import DataBaseObject from '../../database/DataBaseObject.js';
 import FileManager from '../../module/fileManager/fileManager.js';
 
 Page({
-  /**
-   * 页面的初始数据
-   */
   data: {
     imgList: [],
     picker: ['Coffee', 'Tea', 'Soda'],
     isComplete: true
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: function (options) {
     this.fileManager = new FileManager();
     this.oldProduct = this.fileManager.storageInfo.map.get(options.id);
@@ -28,11 +22,12 @@ Page({
       isComplete: true
     })
     this.updFlageList = [];
+    this.newProduct.setValue('status', 2); // status值 0：无变化 1：新增 2：更新 3：删除
     this.newProduct.setValue('classify', this.oldProduct.classify);
     this.newProduct.setValue('name', this.oldProduct.name);
     this.newProduct.setValue('describe', this.oldProduct.describe);
     this.newProduct.setValue('price', this.oldProduct.price);
-    this.newProduct.setValue('icon', this.oldProduct.icon);
+    this.newProduct.setValue('icon', this.oldProduct.orgIcon);
   },
 
   onShow: function () {
@@ -87,12 +82,11 @@ Page({
       sizeType: ['compressed'], //可以指定是原图还是压缩图，默认二者都有
       sourceType: ['album'], //从相册选择
       success: (res) => {
+        this.updFlageList[4] = this.isUpdate('icon', res.tempFilePaths[0]);
         wx.navigateTo({
           url: '../cropper/cropper?src=' + res.tempFilePaths[0]
         })
-      },
-      fail: e => { },
-      complete: () => { }
+      }
     });
   },
 
@@ -126,8 +120,10 @@ Page({
 
   onSubmit: function () {
     let updFlage = this.updFlageList.includes(true);
+    console.log(this.updFlageList);
     if (updFlage) {
-      // this.cloudUploadFile();
+      console.log(this.oldProduct);
+      //this.cloudUploadFile();
     } else {
       wx.showModal({
         title: '提示',
@@ -142,36 +138,37 @@ Page({
     wx.showLoading({
       title: '提交中'
     })
-    const filePath = this.newProduct.getValue('icon');
-    const cloudPath = 'product_icon_' + Date.now() + filePath.match(/\.[^.]+?$/)[0];
-    wx.cloud.uploadFile({
-      cloudPath,
-      filePath,
+    if (this.updFlageList[4]) {
+      const filePath = this.newProduct.getValue('icon');
+      const cloudPath = 'product_icon_' + Date.now() + filePath.match(/\.[^.]+?$/)[0];
+      wx.cloud.uploadFile({
+        cloudPath,
+        filePath,
+        success: res => {
+          this.newProduct.setValue('icon', res.fileID);
+        },
+        fail: e => {
+          wx.showToast({
+            icon: 'none',
+            title: '图片上传失败',
+          })
+        }
+      })
+    }
+    this.newProduct.updInDb({
+      dataID: this.oldProduct._id,
       success: res => {
-        this.newProduct.setValue('icon', res.fileID);
-      },
-      fail: e => {
+        wx.hideLoading();
         wx.showToast({
-          icon: 'none',
-          title: '图片上传失败',
+          title: '提交成功',
         })
       },
-      complete: () => {
-        this.newProduct.addInDB({
-          success: res => {
-            wx.hideLoading();
-            wx.showToast({
-              title: '提交成功',
-            })
-          },
-          fail: err => {
-            wx.showToast({
-              icon: 'none',
-              title: '提交失败'
-            })
-          }
-        });
+      fail: err => {
+        wx.showToast({
+          icon: 'none',
+          title: '提交失败'
+        })
       }
-    })
+    });
   }
 })

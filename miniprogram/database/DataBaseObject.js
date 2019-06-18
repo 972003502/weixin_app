@@ -1,6 +1,6 @@
 class DataBaseObject {
   constructor(dbTable) {
-    this._fieids = dbTable;
+    this._fieids = new dbTable;
     this._tableName = this._fieids[Object.getOwnPropertySymbols(this._fieids)[0]];
     this._db = wx.cloud.database();
     this._dataCollection = [];
@@ -144,8 +144,24 @@ class DataBaseObject {
     callBack.completeAll();
   }
 
-  updInDb() {
-
+  updInDb(obj) {
+    let callBack = {
+      success: obj.success || function () { },
+      fail: obj.fail || function () { },
+      complete: obj.complete || function () { },
+      completeAll: obj.completeAll || function () { }
+    }
+    try {
+      let res = this._db.collection(this._tableName).doc(obj.dataID).update({
+        data: obj.data || this._fieids,
+      });
+      callBack.success(res);
+    } catch (err) {
+      console.log(err);
+      callBack.fail(err);
+    } finally {
+      callBack.complete();
+    }
   }
 };
 

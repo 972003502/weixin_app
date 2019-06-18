@@ -1,26 +1,18 @@
-import table_Projuct from '../../database/table/product.js';
+import table_Projuct from '../../database/table/Product.js';
 import DataBaseObject from '../../database/DataBaseObject.js'
 
 Page({
-  /**
-   * 页面的初始数据
-   */
   data: {
     imgList: [],
     picker: ['Coffee', 'Tea', 'Soda'],
     isComplete: false
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: function () {
     this.newProduct = new DataBaseObject(table_Projuct);
+    this.newProduct.setValue('status', 1); // status值 0：无变化 1：新增 2：更新 3：删除
   },
 
-  /**
- * 生命周期函数--监听页面显示
- */
   onShow: function () {
     this.setData({
       isComplete: this.newProduct.isContainNull()
@@ -65,9 +57,7 @@ Page({
         wx.navigateTo({
           url: '../cropper/cropper?src=' + res.tempFilePaths[0]
         })
-      },
-      fail: e => { },
-      complete: () => { }
+      }
     });
   },
 
