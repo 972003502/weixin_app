@@ -120,9 +120,14 @@ Page({
 
   onSubmit: function () {
     let updFlage = this.updFlageList.includes(true);
-    console.log(this.updFlageList);
     if (updFlage) {
       this.cloudUploadFile();
+      // wx.removeSavedFile({
+      //   filePath: this.oldProduct.icon
+      // })
+      wx.cloud.deleteFile({
+        fileList: [this.oldProduct.orgIcon]
+      })
     } else {
       wx.showModal({
         title: '提示',
@@ -145,6 +150,7 @@ Page({
         filePath,
         success: res => {
           this.newProduct.setValue('icon', res.fileID);
+          this.oldProduct.orgIcon = res.fileID;
         },
         fail: e => {
           wx.showToast({
