@@ -3,29 +3,18 @@ import DataBaseObject from '../../database/DataBaseObject.js';
 import FileManager from '../../module/fileManager/fileManager.js';
 
 Page({
-  /**
-   * 页面的初始数据
-   */
-  //path: "pages/productManagement/productManagement",
   data: {
     products: []
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: function (options) {
     this.fileManager = new FileManager();
     this.product = new DataBaseObject(table_Projuct);
   },
 
-  // 预加载
-  // onPreload: function () {
-  //   this.fileManager = new FileManager();
-  //   this.product = new DataBaseObject(table_Projuct);
-  //   this.onInit();
-  //   console.log("已预加载");
-  // },
+  onShow: function () {
+    this.onInit();
+  },
 
   onInit: function () {
     let productStorage = this.fileManager.storageInfo.values;
@@ -34,19 +23,13 @@ Page({
     })
   },
 
-  groupBy: function (data, fieidName) {
-    let fieidValues = [];
-    let result = [];
-    for (let obj of data) {
-      if (!fieidValues.includes(obj[fieidName])) {
-        fieidValues.push(obj[fieidName]);
-        result.push(data.filter(item => item[fieidName] == obj[fieidName]));
-      }
-    }
-    return result;
+  onAddProduct: function () {
+    wx.navigateTo({
+      url: '../addProduct/addProduct'
+    })
   },
 
-  actionSheetTap: function (e) {
+  onActionSheetTap: function (e) {
     const that = this;
     let productID = e.currentTarget.dataset.id;
     wx.showActionSheet({
@@ -98,24 +81,14 @@ Page({
     })
   },
 
-  onAddProduct: function () {
-    wx.navigateTo({
-      url: '../addProduct/addProduct'
-    })
-  },
-
   onPullDownRefresh: function () {
     wx.showLoading({
       title: '加载中'
     })
-    this.onRefresh();
+    this.refreshPage();
   },
 
-  onShow: function () {
-    this.onInit();
-  },
-
-  onRefresh: function () {
+  refreshPage: function () {
     this.start = Date.now();
     this.newMap = new Map();
     this.product.queryInDb({
@@ -126,15 +99,36 @@ Page({
       },
       complete: () => {
         let newList = [];
+        let updList = [];
+        let delList = [];
         for (let entry of this.newMap) {
-          if (!this.fileManager.storageInfo.keys.includes(entry[0])) {
+          if (entry[1].status == 1) { // 新增
             newList.push(entry[1].icon);
+          } else if (entry[1].status == 2) { // 更新
+            updList.push(entry[0]);
+          } else if (entry[1].status == 3) { // 删除
+            delList.push(entry[0]);
           } else {
-            console.log("重复值");
+            console.log("产品已存在且无变更");
           }
+
+          // if (!this.fileManager.storageInfo.keys.includes(entry[0])) {
+          //   newList.push(entry[1].icon);
+          // } else {
+          //   console.log("重复值");
+          // }
         }
-        if (newList.length != 0) {
-          this.downloadImage(newList);
+
+        if (!newList.length || !updList.length || !delList.length) {
+          if (!newList.length) {
+            this.downloadImage(newList);
+          }
+          if (!updList.length) {
+            this.updProduct(updList);
+          }
+          if (!delList.length) {
+            this.delProduct(delList);
+          }
         } else {
           wx.stopPullDownRefresh({
             complete() {
@@ -153,6 +147,14 @@ Page({
         this.cacheImage();
       }
     });
+  },
+
+  updProduct: function () {
+
+  },
+
+  delProduct: function () {
+
   },
 
   cacheImage: function () {
@@ -183,8 +185,17 @@ Page({
         console.log("耗时", `${end - this.start}ms`);
       }
     })
-  }
+  },
 
-  // onImageLoad: function () {
-  // },
+  groupBy: function (data, fieidName) {
+    let fieidValues = [];
+    let result = [];
+    for (let obj of data) {
+      if (!fieidValues.includes(obj[fieidName])) {
+        fieidValues.push(obj[fieidName]);
+        result.push(data.filter(item => item[fieidName] == obj[fieidName]));
+      }
+    }
+    return result;
+  }
 })
